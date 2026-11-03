@@ -1,0 +1,215 @@
+// "Бид хоёр" — алсын зайн хосын сайтын өгөгдлийн сан.
+// Бүх мөрийн `by` талбар нь "a" эсвэл "b" — хосын аль нь үүсгэснийг заана.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Хосын тохиргоо — ганцхан мөр (id = 1)
+model Settings {
+  id           Int       @id @default(1)
+  nameA        String
+  nameB        String
+  startDate    DateTime? // зөвхөн огноо (UTC шөнө дунд)
+  nextMeet     DateTime?
+  cityA        String? // JSON: { name, tz, lat, lon }
+  cityB        String?
+  passwordHash String
+  vaultPinHash String? // "Нууц өрөө"-ний тусдаа PIN (null = тохируулаагүй)
+  // Өгөгдөл өөрчлөгдөх бүрт нэмэгдэнэ — нөгөө талын браузер шинэчлэгдэх дохио
+  version      Int       @default(0)
+  updatedAt    DateTime  @updatedAt
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  by        String
+  text      String
+  color     String   @default("pink")
+  likedA    Boolean  @default(false)
+  likedB    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// "Нээх захидал" — хүлээн авагч нээх хүртэл битүүмжлэгдэнэ
+model Letter {
+  id        String    @id @default(cuid())
+  by        String
+  title     String
+  body      String
+  openedAt  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Memory {
+  id        String   @id @default(cuid())
+  by        String
+  title     String
+  date      DateTime // зөвхөн огноо
+  place     String   @default("")
+  story     String   @default("")
+  photos    Photo[]
+  createdAt DateTime @default(now())
+}
+
+model Photo {
+  id       String @id @default(cuid())
+  memoryId String
+  memory   Memory @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+  mime     String
+  data     Bytes
+
+  @@index([memoryId])
+}
+
+model BucketItem {
+  id        String    @id @default(cuid())
+  by        String
+  text      String
+  doneAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// "Өдрийн мөч" — хүн бүр өдөрт нэг зураг + сэтгэл + тайлбар
+model Moment {
+  id        String   @id @default(cuid())
+  by        String
+  day       String // YYYY-MM-DD, оруулсан хүний цагаар
+  mood      String
+  caption   String   @default("")
+  filter    String   @default("none")
+  mime      String? // зураггүй бол null
+  photo     Bytes?
+  thumb     Bytes? // хуанлид зориулсан жижиг хувилбар
+  reaction  String? // хайртынх нь үлдээсэн эможи
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([by, day])
+  @@index([day])
+}
+
+// ── Нууц өрөө (18+) — зөвхөн тусдаа PIN-ээр нээгдэнэ, нөөц файлд орохгүй ──
+
+model VaultPhoto {
+  id        String    @id @default(cuid())
+  by        String
+  caption   String    @default("")
+  mime      String
+  data      Bytes
+  thumb     Bytes
+  viewOnce  Boolean   @default(false) // хайрт нь нэг үзмэгц устна
+  viewedAt  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// "Хүслийн тохирол" — item = WISHES-ийн дугаар, answer: 2 тийм, 1 магадгүй, 0 үгүй
+model VaultWish {
+  id        String   @id @default(cuid())
+  by        String
+  item      Int
+  answer    Int
+  createdAt DateTime @default(now())
+
+  @@unique([item, by])
+}
+
+// Профайл зураг (who = "a" | "b")
+model AvatarImage {
+  who       String   @id
+  mime      String
+  data      Bytes
+  updatedAt DateTime @updatedAt
+}
+
+model SpecialDay {
+  id        String   @id @default(cuid())
+  by        String
+  title     String
+  date      DateTime // зөвхөн огноо
+  emoji     String   @default("📌")
+  yearly    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ListItem {
+  id        String    @id @default(cuid())
+  by        String
+  type      String
+  title     String
+  url       String    @default("")
+  doneAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Nudge {
+  id        String   @id @default(cuid())
+  by        String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model DateIdea {
+  id        String   @id @default(cuid())
+  by        String
+  emoji     String   @default("💡")
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model DateLog {
+  id        String   @id @default(cuid())
+  by        String
+  text      String
+  emoji     String   @default("💞")
+  createdAt DateTime @default(now())
+}
+
+// Кино, дуугаа зэрэг асаах тоолуур
+model SyncTimer {
+  id        String   @id @default(cuid())
+  by        String
+  at        DateTime
+  createdAt DateTime @default(now())
+}
+
+model QotdAnswer {
+  id        String   @id @default(cuid())
+  by        String
+  day       String
+  question  String   @default("") // асуултын сан өөрчлөгдсөн ч түүх зөв харагдана
+  text      String
+  createdAt DateTime @default(now())
+
+  @@unique([day, by])
+}
+
+// "Аль нь дээр вэ?" ба "Хэн нь илүү?" тоглоомын хариулт (q = асуултын дугаар)
+model GameAnswer {
+  id        String   @id @default(cuid())
+  by        String
+  game      String
+  q         Int
+  choice    Int
+  createdAt DateTime @default(now())
+
+  @@unique([game, q, by])
+}
+
+// "Намайг хэр мэдэх вэ?" — өөрийнхөө тухай асуулт, хайрт нь таана
+model QuizQuestion {
+  id        String    @id @default(cuid())
+  by        String
+  question  String
+  answer    String
+  guess     String?
+  correct   Boolean?
+  guessedAt DateTime?
+  createdAt DateTime  @default(now())
+}
