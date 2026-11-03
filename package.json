@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start -p 3001",
+    "start": "next start -p ${PORT:-3001}",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -35,5 +35,8 @@
     "better-sqlite3@12.11.1": true,
     "@prisma/engines@7.10.1": true,
     "prisma@7.10.1": true
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }
