@@ -1,14 +1,17 @@
 import { connection } from "next/server";
 import { readSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { scoped } from "@/lib/db";
+import { isWho } from "@/lib/types";
 
 export async function GET(_req: Request, ctx: RouteContext<"/avatars/[who]">) {
   await connection();
-  const s = await prisma.settings.findUnique({ where: { id: 1 } });
-  if (!s || !(await readSession(s.passwordHash))) return new Response("Unauthorized", { status: 401 });
+  const session = await readSession();
+  if (!session) return new Response("Unauthorized", { status: 401 });
 
   const { who } = await ctx.params;
-  const img = await prisma.avatarImage.findUnique({ where: { who } });
+  if (!isWho(who)) return new Response("Not found", { status: 404 });
+  const cid = session.couple.id;
+  const img = await scoped(cid).avatarImage.findUnique({ where: { coupleId_who: { coupleId: cid, who } } });
   if (!img) return new Response("Not found", { status: 404 });
 
   return new Response(img.data, {

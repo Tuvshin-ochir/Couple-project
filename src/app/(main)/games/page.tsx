@@ -9,7 +9,6 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead, Tabs } from "@/components/ui";
 import { WHO_MORE, WOULD_YOU_RATHER, dailyQuestion, qotdDay } from "@/lib/content";
 import { getCtx, type Ctx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { fmtKey } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
@@ -45,9 +44,9 @@ export default async function GamesPage(props: PageProps<"/games">) {
 }
 
 async function Qotd({ ctx }: { ctx: Ctx }) {
-  const { me, names } = ctx;
+  const { me, names, db } = ctx;
   const today = qotdDay();
-  const answers = await prisma.qotdAnswer.findMany({ orderBy: { day: "desc" } });
+  const answers = await db.qotdAnswer.findMany({ orderBy: { day: "desc" } });
   const byDay = new Map<string, typeof answers>();
   for (const a of answers) byDay.set(a.day, [...(byDay.get(a.day) ?? []), a]);
   const past = [...byDay.keys()].filter((d) => d !== today).slice(0, 30);
@@ -90,9 +89,9 @@ async function Qotd({ ctx }: { ctx: Ctx }) {
 
 /** "Аль нь дээр вэ?" ба "Хэн нь илүү?" — хоёулаа сонгосны дараа тохирлыг харуулна */
 async function ChoiceGame({ ctx, game, q }: { ctx: Ctx; game: "wyr" | "who"; q: number }) {
-  const { me, partner, names } = ctx;
+  const { me, partner, names, db } = ctx;
   const size = game === "wyr" ? WOULD_YOU_RATHER.length : WHO_MORE.length;
-  const answers = await prisma.gameAnswer.findMany({ where: { game } });
+  const answers = await db.gameAnswer.findMany({ where: { game } });
   const pick = (w: Who, i: number) => answers.find((a) => a.by === w && a.q === i);
 
   let i = Number.isInteger(q) && q >= 0 && q < size ? q : -1;
@@ -181,8 +180,8 @@ async function ChoiceGame({ ctx, game, q }: { ctx: Ctx; game: "wyr" | "who"; q: 
 }
 
 async function Quiz({ ctx }: { ctx: Ctx }) {
-  const { me, partner, names } = ctx;
-  const all = await prisma.quizQuestion.findMany({ orderBy: { createdAt: "desc" } });
+  const { me, partner, names, db } = ctx;
+  const all = await db.quizQuestion.findMany({ orderBy: { createdAt: "desc" } });
   const forMe = all.filter((x) => x.by === partner);
   const mine = all.filter((x) => x.by === me);
   const judged = forMe.filter((x) => x.correct !== null);

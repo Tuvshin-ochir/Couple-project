@@ -1,10 +1,12 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import type { Couple } from "@/generated/prisma/client";
+import { prisma } from "./db";
 import type { Who } from "./types";
 
-// Хос нэг нууц үгтэй. Нэвтрэхдээ "би хэн бэ" гэдгээ сонгоод нууц үгээ оруулна.
-// Cookie: "<who>.<issuedAt>.<hmac>" — нууц үг солигдвол бүх session хүчингүй болно.
+// Хос бүр нэг нууц үгтэй. Нэвтрэхдээ хосын нэр, "би хэн бэ", нууц үгээ оруулна.
+// Cookie: "<coupleId>.<who>.<issuedAt>.<hmac>" — нууц үг солигдвол бүх session хүчингүй болно.
 
 const COOKIE = "bh_session";
 const MAX_AGE = 60 * 60 * 24 * 180; // 180 хоног
@@ -31,8 +33,8 @@ export function verifyPassword(pw: string, stored: string) {
 const sign = (payload: string, pwHash: string) =>
   createHmac("sha256", secret()).update(`${payload}|${pwHash}`).digest("base64url");
 
-export async function startSession(who: Who, pwHash: string) {
-  const payload = `${who}.${Date.now()}`;
+export async function startSession(coupleId: string, who: Who, pwHash: string) {
+  const payload = `${coupleId}.${who}.${Date.now()}`;
   (await cookies()).set(COOKIE, `${payload}.${sign(payload, pwHash)}`, {
     httpOnly: true,
     sameSite: "lax",
@@ -46,14 +48,17 @@ export async function endSession() {
   (await cookies()).delete(COOKIE);
 }
 
-export async function readSession(pwHash: string): Promise<Who | null> {
+/** Нэвтэрсэн хос ба хэн болохыг буцаана (cookie буруу/хуучирсан бол null) */
+export async function readSession(): Promise<{ couple: Couple; me: Who } | null> {
   const raw = (await cookies()).get(COOKIE)?.value;
   if (!raw) return null;
-  const [who, ts, sig] = raw.split(".");
-  if ((who !== "a" && who !== "b") || !ts || !sig) return null;
+  const [coupleId, who, ts, sig] = raw.split(".");
+  if (!coupleId || (who !== "a" && who !== "b") || !ts || !sig) return null;
   if (Date.now() - Number(ts) > MAX_AGE * 1000) return null;
+  const couple = await prisma.couple.findUnique({ where: { id: coupleId } });
+  if (!couple) return null;
   const a = Buffer.from(sig);
-  const b = Buffer.from(sign(`${who}.${ts}`, pwHash));
+  const b = Buffer.from(sign(`${coupleId}.${who}.${ts}`, couple.passwordHash));
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  return who;
+  return { couple, me: who };
 }

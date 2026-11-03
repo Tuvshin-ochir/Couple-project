@@ -6,7 +6,6 @@ import MomentPair, { momentSrc, type MomentLite } from "@/components/MomentPair"
 import { PageHead } from "@/components/ui";
 import { LOW_MOODS, filterCss, lowMoodText, moodOf } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { dayKey, fmtKey, isDayKey, pad, weekdayOfKey } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
@@ -22,7 +21,7 @@ const shiftMonth = (m: string, by: number) => {
 
 export default async function MomentPage(props: PageProps<"/moment">) {
   const ctx = await getCtx();
-  const { me, partner, names, tz } = ctx;
+  const { me, partner, names, tz, db } = ctx;
   const sp = await props.searchParams;
   const today = dayKey(new Date(), tz);
   const day = typeof sp.day === "string" && isDayKey(sp.day) && sp.day <= today ? sp.day : today;
@@ -30,8 +29,8 @@ export default async function MomentPage(props: PageProps<"/moment">) {
   const isToday = day === today;
 
   const [dayMoments, monthMoments] = await Promise.all([
-    prisma.moment.findMany({ where: { day }, omit: { photo: true, thumb: true } }),
-    prisma.moment.findMany({ where: { day: { startsWith: month } }, omit: { photo: true, thumb: true } }),
+    db.moment.findMany({ where: { day }, omit: { photo: true, thumb: true } }),
+    db.moment.findMany({ where: { day: { startsWith: month } }, omit: { photo: true, thumb: true } }),
   ]);
 
   // Өнөөдөр өөрөө хуваалцаагүй бол хайртынхаа өнөөдрийн мөчийг хуанлид ч харуулахгүй

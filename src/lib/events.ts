@@ -1,5 +1,5 @@
 import "server-only";
-import type { Settings, SpecialDay } from "@/generated/prisma/client";
+import type { Couple, SpecialDay } from "@/generated/prisma/client";
 import { dayKey, daysBetween, nextOccurrence, utcKey } from "./time";
 
 export type Ev = {
@@ -16,7 +16,7 @@ export type Ev = {
 const MILESTONES = [100, 200, 300, 365, 500, 730, 1000, 1095, 1461, 1500, 1826, 2000, 2500, 3000, 3650, 5000];
 
 /** Ирэх өдрүүд: хэрэглэгчийн нэмсэн + уулзалт, ой, "N хоног" (автоматаар) */
-export function upcomingEvents(s: Settings, days: SpecialDay[], today: string, tz: string): Ev[] {
+export function upcomingEvents(s: Couple, days: SpecialDay[], today: string, tz: string): Ev[] {
   const ev: Omit<Ev, "left">[] = days.map((d) => ({
     key: d.id,
     id: d.id,

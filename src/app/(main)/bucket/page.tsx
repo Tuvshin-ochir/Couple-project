@@ -5,7 +5,6 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead, Tabs } from "@/components/ui";
 import { BUCKET_IDEAS } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { fmtDate } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
@@ -18,10 +17,10 @@ const FILTERS = [
 ] as const;
 
 export default async function BucketPage(props: PageProps<"/bucket">) {
-  const { names, tz } = await getCtx();
+  const { names, tz, db } = await getCtx();
   const f = (await props.searchParams).f;
   const filter = f === "todo" || f === "done" ? f : "all";
-  const items = await prisma.bucketItem.findMany({ orderBy: { createdAt: "desc" } });
+  const items = await db.bucketItem.findMany({ orderBy: { createdAt: "desc" } });
 
   const done = items.filter((x) => x.doneAt).length;
   const pct = items.length ? Math.round((done / items.length) * 100) : 0;

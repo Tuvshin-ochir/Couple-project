@@ -8,7 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead, Tabs } from "@/components/ui";
 import { NOTE_COLORS } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
+import type { Db } from "@/lib/db";
 import { dayKey, fmtKeyShort, rel } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
@@ -16,9 +16,9 @@ export const metadata: Metadata = { title: "Захидал" };
 
 export default async function NotesPage(props: PageProps<"/notes">) {
   const ctx = await getCtx();
-  const { me, partner, names, tz } = ctx;
+  const { me, partner, names, tz, db } = ctx;
   const tab = (await props.searchParams).tab === "letters" ? "letters" : "wall";
-  const unread = await prisma.letter.count({ where: { by: partner, openedAt: null } });
+  const unread = await db.letter.count({ where: { by: partner, openedAt: null } });
 
   return (
     <>
@@ -31,13 +31,13 @@ export default async function NotesPage(props: PageProps<"/notes">) {
         current={tab}
         href={(k) => (k === "wall" ? "/notes" : `/notes?tab=${k}`)}
       />
-      {tab === "wall" ? <Wall me={me} names={names} tz={tz} /> : <Letters me={me} partner={partner} names={names} tz={tz} />}
+      {tab === "wall" ? <Wall db={db} me={me} names={names} tz={tz} /> : <Letters db={db} me={me} partner={partner} names={names} tz={tz} />}
     </>
   );
 }
 
-async function Wall({ me, names, tz }: { me: Who; names: Record<Who, string>; tz: string }) {
-  const notes = await prisma.note.findMany({ orderBy: { createdAt: "desc" } });
+async function Wall({ db, me, names, tz }: { db: Db; me: Who; names: Record<Who, string>; tz: string }) {
+  const notes = await db.note.findMany({ orderBy: { createdAt: "desc" } });
   const now = new Date();
 
   return (
@@ -96,8 +96,8 @@ async function Wall({ me, names, tz }: { me: Who; names: Record<Who, string>; tz
   );
 }
 
-async function Letters({ me, partner, names, tz }: { me: Who; partner: Who; names: Record<Who, string>; tz: string }) {
-  const letters = await prisma.letter.findMany({ orderBy: { createdAt: "desc" } });
+async function Letters({ db, me, partner, names, tz }: { db: Db; me: Who; partner: Who; names: Record<Who, string>; tz: string }) {
+  const letters = await db.letter.findMany({ orderBy: { createdAt: "desc" } });
   const now = new Date();
   const toMe = letters.filter((l) => l.by === partner);
   const mine = letters.filter((l) => l.by === me);

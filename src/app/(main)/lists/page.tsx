@@ -5,16 +5,15 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead, Tabs } from "@/components/ui";
 import { LIST_TYPES, listTypeOf } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import type { Who } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Жагсаалт" };
 
 export default async function ListsPage(props: PageProps<"/lists">) {
-  const { names } = await getCtx();
+  const { names, db } = await getCtx();
   const t = (await props.searchParams).type;
   const type = LIST_TYPES.some((x) => x.key === t) ? (t as string) : "all";
-  const items = await prisma.listItem.findMany({
+  const items = await db.listItem.findMany({
     where: type === "all" ? {} : { type },
     orderBy: { createdAt: "desc" },
   });

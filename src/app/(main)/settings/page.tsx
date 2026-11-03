@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { logout } from "@/app/actions";
 import Avatar from "@/components/Avatar";
 import AvatarUploader from "@/components/AvatarUploader";
+import DeleteCouple from "@/components/DeleteCouple";
+import InviteLink from "@/components/InviteLink";
 import PasswordForm from "@/components/PasswordForm";
 import ProfileForm from "@/components/ProfileForm";
 import ThemePicker from "@/components/ThemePicker";
@@ -17,6 +19,12 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHead emoji="⚙️" title="Тохиргоо" sub="Бидний тухай мэдээлэл, профайл зураг, өнгө, нууц үг." />
+
+      <section className="card">
+        <h2>Хосын нэр: {s.handle}</h2>
+        <p className="small muted">Хайртдаа энэ холбоосыг илгээгээрэй — орж ирээд өөрийгөө сонгож, хосын нууц үгээр нэвтэрнэ.</p>
+        <InviteLink handle={s.handle} />
+      </section>
 
       <section className="card">
         <h2>Профайл зураг</h2>
@@ -47,8 +55,7 @@ export default async function SettingsPage() {
       <section className="card">
         <h2>Нөөц</h2>
         <p className="small muted">
-          Бүх өгөгдлөө (зурагтай нь) JSON файлаар татаж аваарай. Өгөгдлийн сан өөрөө <code>prisma/dev.db</code> файлд
-          хадгалагддаг.
+          Бүх өгөгдлөө (зурагтай нь) JSON файлаар татаж аваарай. Нууц өрөөний агуулга нөөцөд ордоггүй.
         </p>
         <a className="btn line" href="/api/export" download>
           Нөөц татах (JSON)
@@ -66,6 +73,11 @@ export default async function SettingsPage() {
         <form action={logout}>
           <button className="btn line">Гарах</button>
         </form>
+      </section>
+
+      <section className="card danger-zone">
+        <h2>Аюултай бүс</h2>
+        <DeleteCouple />
       </section>
     </>
   );

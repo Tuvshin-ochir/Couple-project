@@ -3,7 +3,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { prisma } from "./db";
+import { scoped } from "./db";
 import { readSession } from "./auth";
 import { DEFAULT_TZ, validTz } from "./time";
 import { other, type City, type Who } from "./types";
@@ -27,28 +27,29 @@ export function viewerTz(jarTz: string | undefined, city: City | null) {
   return validTz(tz) ? tz : city?.tz ?? DEFAULT_TZ;
 }
 
-export const getSettings = cache(() => prisma.settings.findUnique({ where: { id: 1 } }));
-
-/** Нэвтэрсэн хүний мэдээлэл. Нэвтрээгүй бол /login, хос үүсээгүй бол /setup руу шилжүүлнэ. */
+/** Нэвтэрсэн хүний мэдээлэл. Нэвтрээгүй бол нүүр хуудас (/welcome) руу шилжүүлнэ. */
 export const getCtx = cache(async () => {
   // Хуудас бүр хүсэлтийн үед (нэвтрэлт, одоогийн цаг) рендерлэгдэнэ — prerender үед
   // өгөгдлийн сан руу хандахгүй, Date.now() дуудагдахгүй
   await connection();
   const jar = await cookies();
-  const s = await getSettings();
-  if (!s) redirect("/setup");
-  const me = await readSession(s.passwordHash);
-  if (!me) redirect("/login");
+  const session = await readSession();
+  if (!session) redirect("/welcome");
+  const { couple: s, me } = session;
+  // Энэ хосын өгөгдөлд л хүрдэг client — бүх хуудас үүнийг ашиглана
+  const db = scoped(s.id);
   const cityA = parseCity(s.cityA);
   const cityB = parseCity(s.cityB);
   const partner = other(me);
   const names = { a: s.nameA, b: s.nameB };
   // Профайл зургийн хувилбар (кэш шинэчлэхэд ашиглана) — зураг байхгүй бол 0
-  const avatarRows = await prisma.avatarImage.findMany({ select: { who: true, updatedAt: true } });
+  const avatarRows = await db.avatarImage.findMany({ select: { who: true, updatedAt: true } });
   const avatars: Record<Who, number> = { a: 0, b: 0 };
   for (const r of avatarRows) if (r.who === "a" || r.who === "b") avatars[r.who] = r.updatedAt.getTime();
   return {
     s,
+    cid: s.id,
+    db,
     me,
     partner,
     names,

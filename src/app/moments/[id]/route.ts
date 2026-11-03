@@ -1,16 +1,17 @@
 import { connection } from "next/server";
 import { readSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { scoped } from "@/lib/db";
 
 // Өдрийн мөчийн зураг. ?s=thumb бол хуанлид зориулсан жижиг хувилбар.
 export async function GET(req: Request, ctx: RouteContext<"/moments/[id]">) {
   await connection();
-  const s = await prisma.settings.findUnique({ where: { id: 1 } });
-  if (!s || !(await readSession(s.passwordHash))) return new Response("Unauthorized", { status: 401 });
+  const session = await readSession();
+  if (!session) return new Response("Unauthorized", { status: 401 });
+  const db = scoped(session.couple.id);
 
   const { id } = await ctx.params;
   const thumb = new URL(req.url).searchParams.get("s") === "thumb";
-  const m = await prisma.moment.findUnique({
+  const m = await db.moment.findUnique({
     where: { id },
     select: { mime: true, photo: !thumb, thumb },
   });
