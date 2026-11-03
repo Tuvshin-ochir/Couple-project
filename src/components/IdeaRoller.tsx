@@ -35,7 +35,7 @@ export default function IdeaRoller({ ideas, initial, big }: { ideas: Idea[]; ini
         <form action={logDate}>
           <input type="hidden" name="text" value={idea.text} />
           <input type="hidden" name="emoji" value={idea.emoji} />
-          <SubmitButton className={big ? "btn ghost" : "btn line sm"} toastMsg="💞 Болзооны түүхэнд нэмэгдлээ" burst={6}>
+          <SubmitButton className={big ? "btn ghost" : "btn line sm"} toastMsg="Болзооны түүхэнд нэмэгдлээ">
             ✓ Хийлээ
           </SubmitButton>
         </form>

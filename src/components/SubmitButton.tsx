@@ -2,29 +2,26 @@
 
 import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
-import { hearts, pulseNow, toast } from "@/lib/fx";
+import { pulseNow, toast } from "@/lib/fx";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   /** Дарахаас өмнө асуух асуулт */
   confirm?: string;
   /** Амжилттай дууссаны дараах мэдэгдэл */
   toastMsg?: string;
-  /** Зүрхний бороо */
-  burst?: number;
 };
 
-export default function SubmitButton({ confirm, toastMsg, burst, className = "btn", onClick, children, ...rest }: Props) {
+export default function SubmitButton({ confirm, toastMsg, className = "btn", onClick, children, ...rest }: Props) {
   const { pending } = useFormStatus();
   const wasPending = useRef(false);
 
   useEffect(() => {
     if (wasPending.current && !pending) {
       if (toastMsg) toast(toastMsg);
-      if (burst) hearts(burst);
       pulseNow();
     }
     wasPending.current = pending;
-  }, [pending, toastMsg, burst]);
+  }, [pending, toastMsg]);
 
   return (
     <button

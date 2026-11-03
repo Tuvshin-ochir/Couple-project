@@ -1,33 +1,30 @@
 /* ═══════════════ Токенууд ═══════════════ */
+/* Цаас, бэх, тоосгон улаан — ганц өнгөт аялгуу, градиентгүй */
 :root {
-  --bg: #faf5f0;
-  --glow-1: rgb(255 168 190 / 38%);
-  --glow-2: rgb(255 204 160 / 32%);
-  --surface: #ffffff;
-  --surface-2: #fbf7f4;
-  --surface-3: #f5ece7;
-  --text: #2b1a22;
-  --text-2: #5c4a52;
-  --muted: #8d7881;
-  --line: #f0e5e1;
-  --line-2: #e5d6d1;
-  --rose: #e0436d;
-  --rose-soft: #fde8ee;
+  --bg: #f5f2ec;
+  --surface: #fffefb;
+  --surface-2: #faf8f4;
+  --surface-3: #f0ece5;
+  --text: #1d1a17;
+  --text-2: #48423b;
+  --muted: #7b7369;
+  --line: #e7e1d8;
+  --line-2: #d8d0c4;
+  --rose: #a5463d;
+  --rose-soft: #f5e9e5;
   --on-rose: #ffffff;
-  --grad: linear-gradient(135deg, #ff8a7a 0%, #e8476f 48%, #c2367c 100%);
-  --hero:
-    radial-gradient(90% 120% at 0% 0%, rgb(255 170 140 / 90%) 0%, transparent 55%),
-    radial-gradient(90% 130% at 100% 100%, rgb(150 50 140 / 85%) 0%, transparent 60%),
-    linear-gradient(135deg, #f2607e, #d63f78);
-  --a: #ec5b80;
-  --b: #6479e2;
-  --ok: #22a06b;
-  --bad: #d23c3c;
-  --sh-1: 0 1px 2px rgb(74 35 64 / 5%), 0 4px 14px rgb(74 35 64 / 5%);
-  --sh-2: 0 2px 6px rgb(74 35 64 / 6%), 0 16px 40px rgb(74 35 64 / 10%);
-  --sh-3: 0 12px 40px rgb(74 35 64 / 18%);
-  --r-lg: 24px;
-  --r-md: 16px;
+  --grad: #a5463d;
+  --hero: #fffefb;
+  --a: #b5584e;
+  --b: #4e6a8a;
+  --ok: #2f7d55;
+  --bad: #b3402f;
+  --sh-1: 0 1px 2px rgb(40 30 20 / 5%), 0 2px 8px rgb(40 30 20 / 4%);
+  --sh-2: 0 2px 6px rgb(40 30 20 / 6%), 0 12px 32px rgb(40 30 20 / 8%);
+  --sh-3: 0 12px 36px rgb(40 30 20 / 16%);
+  --r-lg: 16px;
+  --r-md: 12px;
+  --bg-amt: 60%;
   --sans: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --serif: var(--font-serif), Georgia, "Times New Roman", serif;
   --hand: var(--font-hand), "Comic Sans MS", cursive;
@@ -36,62 +33,117 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #130c11;
-    --glow-1: rgb(224 67 109 / 16%);
-    --glow-2: rgb(120 60 170 / 16%);
-    --surface: #1d141a;
-    --surface-2: #251a21;
-    --surface-3: #2d2028;
-    --text: #f7eaf0;
-    --text-2: #d8c3cd;
-    --muted: #a58c98;
-    --line: #31232b;
-    --line-2: #3d2c36;
-    --rose: #ff6f93;
-    --rose-soft: #3b1c29;
-    --grad: linear-gradient(135deg, #f0607a 0%, #d63c6e 50%, #a8307a 100%);
-    --hero:
-      radial-gradient(90% 120% at 0% 0%, rgb(230 110 110 / 70%) 0%, transparent 55%),
-      radial-gradient(90% 130% at 100% 100%, rgb(110 40 130 / 90%) 0%, transparent 60%),
-      linear-gradient(135deg, #b83a62, #8a2b66);
-    --a: #ff7597;
-    --b: #8ea2ff;
-    --ok: #4cc38a;
-    --bad: #ff6b5e;
-    --sh-1: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 14px rgb(0 0 0 / 18%);
-    --sh-2: 0 2px 6px rgb(0 0 0 / 30%), 0 16px 40px rgb(0 0 0 / 30%);
-    --sh-3: 0 12px 40px rgb(0 0 0 / 45%);
+    --bg-amt: 26%;
+    --bg: #12110f;
+    --surface: #1a1816;
+    --surface-2: #201e1b;
+    --surface-3: #292622;
+    --text: #eee8e0;
+    --text-2: #c9c1b6;
+    --muted: #958c80;
+    --line: #2b2824;
+    --line-2: #3a3631;
+    --rose: #d9826f;
+    --rose-soft: #33221d;
+    --on-rose: #1a1210;
+    --grad: #d9826f;
+    --hero: #1a1816;
+    --a: #d0786b;
+    --b: #7e9cc0;
+    --ok: #5fb98a;
+    --bad: #e0705e;
+    --sh-1: 0 1px 2px rgb(0 0 0 / 30%), 0 2px 8px rgb(0 0 0 / 16%);
+    --sh-2: 0 2px 6px rgb(0 0 0 / 30%), 0 12px 32px rgb(0 0 0 / 28%);
+    --sh-3: 0 12px 36px rgb(0 0 0 / 45%);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #130c11;
-  --glow-1: rgb(224 67 109 / 16%);
-  --glow-2: rgb(120 60 170 / 16%);
-  --surface: #1d141a;
-  --surface-2: #251a21;
-  --surface-3: #2d2028;
-  --text: #f7eaf0;
-  --text-2: #d8c3cd;
-  --muted: #a58c98;
-  --line: #31232b;
-  --line-2: #3d2c36;
-  --rose: #ff6f93;
-  --rose-soft: #3b1c29;
-  --grad: linear-gradient(135deg, #f0607a 0%, #d63c6e 50%, #a8307a 100%);
-  --hero:
-    radial-gradient(90% 120% at 0% 0%, rgb(230 110 110 / 70%) 0%, transparent 55%),
-    radial-gradient(90% 130% at 100% 100%, rgb(110 40 130 / 90%) 0%, transparent 60%),
-    linear-gradient(135deg, #b83a62, #8a2b66);
-  --a: #ff7597;
-  --b: #8ea2ff;
-  --ok: #4cc38a;
-  --bad: #ff6b5e;
-  --sh-1: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 14px rgb(0 0 0 / 18%);
-  --sh-2: 0 2px 6px rgb(0 0 0 / 30%), 0 16px 40px rgb(0 0 0 / 30%);
-  --sh-3: 0 12px 40px rgb(0 0 0 / 45%);
+  --bg-amt: 26%;
+  --bg: #12110f;
+  --surface: #1a1816;
+  --surface-2: #201e1b;
+  --surface-3: #292622;
+  --text: #eee8e0;
+  --text-2: #c9c1b6;
+  --muted: #958c80;
+  --line: #2b2824;
+  --line-2: #3a3631;
+  --rose: #d9826f;
+  --rose-soft: #33221d;
+  --on-rose: #1a1210;
+  --grad: #d9826f;
+  --hero: #1a1816;
+  --a: #d0786b;
+  --b: #7e9cc0;
+  --ok: #5fb98a;
+  --bad: #e0705e;
+  --sh-1: 0 1px 2px rgb(0 0 0 / 30%), 0 2px 8px rgb(0 0 0 / 16%);
+  --sh-2: 0 2px 6px rgb(0 0 0 / 30%), 0 12px 32px rgb(0 0 0 / 28%);
+  --sh-3: 0 12px 36px rgb(0 0 0 / 45%);
   color-scheme: dark;
+}
+
+/* ── Хосын өнгөөр будсан theme ──
+   Тохиргоо → Арын өнгө сонговол (.app[data-tint], :root дээр --bg-1/--bg-2) бүх токеныг
+   эхний өнгөний аялгуугаар дахин тооцно. Гэрэл (L)-ийг тогтмол барьж, зөвхөн өнгө аяс (h)-ыг
+   авдаг тул ямар ч өнгө сонгосон уншигдахуйц. Саарал сонговол c=0 → саарал хэвээр. */
+@supports (color: oklch(from red l c h)) {
+  :root:has(.app[data-tint]) {
+    --bg: oklch(from var(--bg-1) 0.965 min(c, 0.014) h);
+    --surface: oklch(from var(--bg-1) 0.993 min(c, 0.005) h);
+    --surface-2: oklch(from var(--bg-1) 0.978 min(c, 0.008) h);
+    --surface-3: oklch(from var(--bg-1) 0.945 min(c, 0.014) h);
+    --text: oklch(from var(--bg-1) 0.22 min(c, 0.014) h);
+    --text-2: oklch(from var(--bg-1) 0.4 min(c, 0.018) h);
+    --muted: oklch(from var(--bg-1) 0.55 min(c, 0.022) h);
+    --line: oklch(from var(--bg-1) 0.91 min(c, 0.014) h);
+    --line-2: oklch(from var(--bg-1) 0.85 min(c, 0.02) h);
+    --rose: oklch(from var(--bg-1) 0.5 min(c * 1.6, 0.15) h);
+    --rose-soft: oklch(from var(--bg-1) 0.945 min(c * 0.5, 0.035) h);
+    --on-rose: #ffffff;
+    --grad: var(--rose);
+    --hero: var(--surface);
+    --a: oklch(from var(--bg-1) 0.57 min(c * 1.6, 0.14) h);
+    --b: oklch(from var(--bg-2) 0.52 min(c * 1.6, 0.12) h);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):has(.app[data-tint]) {
+      --bg: oklch(from var(--bg-1) 0.165 min(c, 0.01) h);
+      --surface: oklch(from var(--bg-1) 0.2 min(c, 0.011) h);
+      --surface-2: oklch(from var(--bg-1) 0.225 min(c, 0.012) h);
+      --surface-3: oklch(from var(--bg-1) 0.255 min(c, 0.014) h);
+      --text: oklch(from var(--bg-1) 0.93 min(c, 0.012) h);
+      --text-2: oklch(from var(--bg-1) 0.81 min(c, 0.016) h);
+      --muted: oklch(from var(--bg-1) 0.65 min(c, 0.02) h);
+      --line: oklch(from var(--bg-1) 0.265 min(c, 0.012) h);
+      --line-2: oklch(from var(--bg-1) 0.32 min(c, 0.016) h);
+      --rose: oklch(from var(--bg-1) 0.72 min(c * 1.4, 0.13) h);
+      --rose-soft: oklch(from var(--bg-1) 0.27 min(c * 0.5, 0.04) h);
+      --on-rose: oklch(from var(--bg-1) 0.18 min(c, 0.03) h);
+      --a: oklch(from var(--bg-1) 0.69 min(c * 1.4, 0.12) h);
+      --b: oklch(from var(--bg-2) 0.7 min(c * 1.4, 0.1) h);
+    }
+  }
+
+  :root[data-theme="dark"]:has(.app[data-tint]) {
+    --bg: oklch(from var(--bg-1) 0.165 min(c, 0.01) h);
+    --surface: oklch(from var(--bg-1) 0.2 min(c, 0.011) h);
+    --surface-2: oklch(from var(--bg-1) 0.225 min(c, 0.012) h);
+    --surface-3: oklch(from var(--bg-1) 0.255 min(c, 0.014) h);
+    --text: oklch(from var(--bg-1) 0.93 min(c, 0.012) h);
+    --text-2: oklch(from var(--bg-1) 0.81 min(c, 0.016) h);
+    --muted: oklch(from var(--bg-1) 0.65 min(c, 0.02) h);
+    --line: oklch(from var(--bg-1) 0.265 min(c, 0.012) h);
+    --line-2: oklch(from var(--bg-1) 0.32 min(c, 0.016) h);
+    --rose: oklch(from var(--bg-1) 0.72 min(c * 1.4, 0.13) h);
+    --rose-soft: oklch(from var(--bg-1) 0.27 min(c * 0.5, 0.04) h);
+    --on-rose: oklch(from var(--bg-1) 0.18 min(c, 0.03) h);
+    --a: oklch(from var(--bg-1) 0.69 min(c * 1.4, 0.12) h);
+    --b: oklch(from var(--bg-2) 0.7 min(c * 1.4, 0.1) h);
+  }
 }
 
 /* ═══════════════ Үндэс ═══════════════ */
@@ -109,10 +161,6 @@ body {
 body {
   min-height: 100vh;
   background-color: var(--bg);
-  background-image:
-    radial-gradient(60rem 40rem at 100% -10%, var(--glow-1), transparent 60%),
-    radial-gradient(50rem 40rem at -10% 110%, var(--glow-2), transparent 60%);
-  background-attachment: fixed;
   color: var(--text);
   font-family: var(--sans);
   font-size: 16px;
@@ -161,6 +209,14 @@ code {
   max-width: 1180px;
   margin: 0 auto;
   padding: 30px clamp(16px, 3.5vw, 44px) 80px;
+}
+
+/* Хосын сонгосон арын градиент (Тохиргоо → Арын өнгө); сонгоогүй бол тунгалаг */
+.app {
+  background-image:
+    radial-gradient(70rem 50rem at 100% -10%, color-mix(in srgb, var(--bg-1, transparent) var(--bg-amt), transparent), transparent 70%),
+    radial-gradient(60rem 50rem at -10% 110%, color-mix(in srgb, var(--bg-2, transparent) var(--bg-amt), transparent), transparent 70%);
+  background-attachment: fixed;
 }
 
 /* ── Хажуугийн цэс ── */
@@ -380,11 +436,11 @@ code {
     width: 54px;
     height: 54px;
     margin-top: -30px;
-    border-radius: 19px;
-    background: var(--grad);
-    color: #fff;
+    border-radius: 18px;
+    background: var(--text);
+    color: var(--bg);
     box-shadow:
-      0 10px 22px rgb(224 67 109 / 42%),
+      0 6px 16px rgb(0 0 0 / 16%),
       0 0 0 5px var(--bg);
     transition: transform 0.15s;
   }
@@ -501,11 +557,11 @@ code {
   place-items: center;
   width: 54px;
   height: 54px;
-  border-radius: 18px;
+  border-radius: 14px;
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--sh-1);
-  font-size: 26px;
+  color: var(--text-2);
 }
 
 .page-head h1 {
@@ -529,8 +585,7 @@ code {
   .page-ico {
     width: 46px;
     height: 46px;
-    border-radius: 15px;
-    font-size: 22px;
+    border-radius: 12px;
   }
 }
 
@@ -653,6 +708,11 @@ code {
   min-width: 0;
 }
 
+/* Маягт-картын хэсгүүд (мөр, товч) хоорондоо наалдахгүй; hidden input тооцохгүй */
+form.card:not(.row, .quiz) > :not(input[type="hidden"]) ~ * {
+  margin-top: 14px;
+}
+
 .cols2,
 .cols3 {
   display: grid;
@@ -699,7 +759,7 @@ code {
   padding: 0 6px;
   border-radius: 99px;
   background: var(--rose);
-  color: #fff;
+  color: var(--on-rose);
   font-family: var(--sans);
   font-size: 11.5px;
   font-weight: 800;
@@ -749,14 +809,14 @@ code {
   gap: 8px;
   padding: 11px 20px;
   border: 0;
-  border-radius: 999px;
-  background: var(--grad);
-  color: #fff;
+  border-radius: 12px;
+  background: var(--rose);
+  color: var(--on-rose);
   font: inherit;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--rose) 28%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
   transition:
     transform 0.12s,
     filter 0.15s,
@@ -764,7 +824,7 @@ code {
 }
 
 .btn:hover {
-  filter: brightness(1.06);
+  filter: brightness(0.94);
 }
 
 .btn:active {
@@ -792,6 +852,7 @@ code {
 
 .btn.sm {
   padding: 7px 14px;
+  border-radius: 10px;
   font-size: 14px;
 }
 
@@ -1062,11 +1123,11 @@ textarea:focus {
 }
 
 .av-a {
-  background: linear-gradient(140deg, color-mix(in srgb, var(--a) 70%, #fff), var(--a));
+  background: var(--a);
 }
 
 .av-b {
-  background: linear-gradient(140deg, color-mix(in srgb, var(--b) 70%, #fff), var(--b));
+  background: var(--b);
 }
 
 .av.sm {
@@ -1085,7 +1146,7 @@ textarea:focus {
   width: 84px;
   height: 84px;
   font-size: 32px;
-  box-shadow: 0 0 0 4px #fff;
+  box-shadow: 0 0 0 4px var(--surface);
 }
 
 /* ═══════════════ Санаж байна ═══════════════ */
@@ -1109,14 +1170,24 @@ textarea:focus {
   place-items: center;
   width: 96px;
   height: 96px;
+  border: 1px solid color-mix(in srgb, var(--rose) 22%, transparent);
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--rose-soft);
+  color: var(--rose);
+  transition:
+    transform 0.15s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.miss-big:hover .miss-heart {
+  background: color-mix(in srgb, var(--rose) 16%, var(--surface));
+}
+
+.miss-big.sent .miss-heart {
+  border-color: transparent;
+  background: var(--ok);
   color: #fff;
-  box-shadow:
-    0 14px 30px rgb(224 67 109 / 38%),
-    inset 0 -6px 14px rgb(0 0 0 / 12%);
-  animation: beat 2.6s ease-in-out infinite;
-  transition: transform 0.15s;
 }
 
 .miss-big:active .miss-heart {
@@ -1125,10 +1196,16 @@ textarea:focus {
 
 .miss-heart svg,
 .miss-pill svg,
-.miss-icon svg,
-.hero-heart svg {
+.miss-icon svg {
   fill: currentColor;
   stroke: none;
+}
+
+.sent .miss-heart svg,
+.miss-pill.sent svg,
+.miss-icon.sent svg {
+  fill: none;
+  stroke: currentColor;
 }
 
 .miss-pill {
@@ -1138,16 +1215,25 @@ textarea:focus {
   gap: 8px;
   width: 100%;
   padding: 11px 14px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--grad);
-  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--rose) 22%, transparent);
+  border-radius: 12px;
+  background: var(--rose-soft);
+  color: var(--rose);
   font: inherit;
   font-size: 14.5px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 18px color-mix(in srgb, var(--rose) 30%, transparent);
-  transition: transform 0.12s;
+  transition:
+    transform 0.12s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.miss-pill.sent,
+.miss-icon.sent {
+  border-color: transparent;
+  background: var(--ok);
+  color: #fff;
 }
 
 .miss-pill:active {
@@ -1168,22 +1254,6 @@ textarea:focus {
 
 .miss-icon:active {
   transform: scale(0.9);
-}
-
-@keyframes beat {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  12% {
-    transform: scale(1.08);
-  }
-  24% {
-    transform: scale(1);
-  }
-  36% {
-    transform: scale(1.05);
-  }
 }
 
 /* ═══════════════ Нүүр (bento) ═══════════════ */
@@ -1250,43 +1320,20 @@ textarea:focus {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 34px 40px;
-  border-radius: 28px;
-  background: var(--hero);
-  color: #fff;
-  box-shadow: var(--sh-2);
-  isolation: isolate;
-}
-
-.hero::before,
-.hero::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 10%);
-}
-
-.hero::before {
-  width: 280px;
-  height: 280px;
-  right: 18%;
-  top: -150px;
-}
-
-.hero::after {
-  width: 180px;
-  height: 180px;
-  left: 38%;
-  bottom: -110px;
+  padding: 30px 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--sh-1);
 }
 
 .hero .eyebrow {
-  color: rgb(255 255 255 / 85%);
+  color: var(--muted);
   text-transform: none;
   letter-spacing: 0;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .hero-title {
@@ -1299,25 +1346,21 @@ textarea:focus {
 }
 
 .hero .hero-title em {
-  color: #ffd9e2;
+  color: var(--rose);
 }
 
 .hero-sub {
   margin: 0;
   font-size: 16px;
-  font-weight: 600;
-  color: rgb(255 255 255 / 90%);
+  font-weight: 500;
+  color: var(--text-2);
 }
 
 .hero-sub b {
   font-family: var(--serif);
   font-size: 22px;
-  color: #fff;
-}
-
-.hero .btn.ghost {
-  background: rgb(255 255 255 / 20%);
-  color: #fff;
+  font-weight: 400;
+  color: var(--text);
 }
 
 .hero-avatars {
@@ -1326,19 +1369,9 @@ textarea:focus {
   flex: none;
 }
 
-.hero-heart {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  margin: 0 -12px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--rose);
-  box-shadow: 0 6px 14px rgb(0 0 0 / 15%);
-  animation: beat 2.6s ease-in-out infinite;
+/* Хоёр зураг давхцана — хоёр хүн нэг дор */
+.hero-avatars .av + .av {
+  margin-left: -20px;
 }
 
 @media (max-width: 720px) {
@@ -1361,7 +1394,6 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  background: linear-gradient(180deg, var(--surface) 30%, color-mix(in srgb, var(--rose-soft) 75%, var(--surface)));
 }
 
 .miss-card p {
@@ -1394,8 +1426,9 @@ textarea:focus {
 .stats b {
   font-family: var(--serif);
   font-size: 28px;
+  font-weight: 400;
   line-height: 1.15;
-  color: var(--rose);
+  color: var(--text);
 }
 
 .stats span {
@@ -1586,7 +1619,7 @@ textarea:focus {
   position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 5;
-  background: linear-gradient(160deg, #fde2ea, #fbe8d6);
+  background: #ebe5db;
 }
 
 .polaroid .ph img {
@@ -1614,7 +1647,7 @@ textarea:focus {
   gap: 8px;
   border: 0;
   background: rgb(255 255 255 / 55%);
-  color: #b4486a;
+  color: var(--rose);
   font: inherit;
   font-weight: 800;
   cursor: pointer;
@@ -1717,8 +1750,8 @@ textarea:focus {
 }
 
 .polaroid-cta {
-  border: 2px dashed color-mix(in srgb, var(--rose) 45%, transparent);
-  background: color-mix(in srgb, var(--rose-soft) 55%, var(--surface));
+  border: 2px dashed var(--line-2);
+  background: var(--surface-2);
   color: var(--text);
   cursor: pointer;
   transition:
@@ -1748,20 +1781,17 @@ textarea:focus {
   width: 66px;
   height: 66px;
   margin-bottom: 6px;
-  border-radius: 22px;
-  background: var(--grad);
-  color: #fff;
+  border-radius: 20px;
+  background: var(--surface-3);
+  color: var(--text-2);
   font-size: 30px;
-  box-shadow: 0 10px 22px rgb(224 67 109 / 35%);
 }
 
 .polaroid-locked {
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(60% 50% at 30% 30%, rgb(255 255 255 / 35%), transparent),
-    linear-gradient(160deg, #f6a2b6, #c76aae 55%, #7d63c9);
-  color: #fff;
+  background: #2b2723;
+  color: #f5f2ec;
   box-shadow: var(--sh-2);
   transform: rotate(2deg);
 }
@@ -2265,7 +2295,7 @@ a.cal-day:hover {
 
 /* ═══════════════ Зурвас, захидал ═══════════════ */
 .sw-pink {
-  background: #ffe1ea;
+  background: #f6ddd6;
 }
 
 .sw-yellow {
@@ -2391,9 +2421,7 @@ a.cal-day:hover {
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background:
-    linear-gradient(160deg, transparent 62%, color-mix(in srgb, var(--rose) 6%, transparent) 62%),
-    var(--surface);
+  background: var(--surface);
   box-shadow: var(--sh-1);
 }
 
@@ -2410,21 +2438,19 @@ a.cal-day:hover {
 }
 
 .env.sealed::after {
-  content: "♥";
+  content: "";
   position: absolute;
   top: 16px;
   right: 16px;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ff8aa5, #b8274f 70%);
-  color: #ffd2dd;
-  font-size: 15px;
+  /* лац тамга */
+  background: radial-gradient(circle at 38% 32%, #b8574c, #7a2c24 72%);
   box-shadow:
-    0 3px 8px rgb(120 20 50 / 35%),
-    inset 0 -3px 5px rgb(0 0 0 / 20%);
+    0 2px 5px rgb(60 20 10 / 30%),
+    inset 0 0 0 4px rgb(0 0 0 / 10%),
+    inset 0 -2px 4px rgb(0 0 0 / 22%);
 }
 
 .paper {
@@ -2432,7 +2458,7 @@ a.cal-day:hover {
   padding: 18px 26px 22px;
   border-radius: 10px;
   background:
-    repeating-linear-gradient(transparent 0 33px, rgb(224 67 109 / 16%) 33px 34px),
+    repeating-linear-gradient(transparent 0 33px, rgb(70 100 140 / 16%) 33px 34px),
     #fffaf0;
   color: #36242c;
   font-family: var(--hand);
@@ -2527,7 +2553,7 @@ a.cal-day:hover {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--rose);
   box-shadow: 0 0 0 4px var(--bg);
 }
 
@@ -2589,7 +2615,7 @@ a.cal-day:hover {
   display: block;
   height: 100%;
   border-radius: 99px;
-  background: var(--grad);
+  background: var(--rose);
   transition: width 0.4s;
 }
 
@@ -2758,9 +2784,9 @@ a.cal-day:hover {
   min-height: 240px;
   margin-bottom: 16px;
   padding: 36px 24px;
-  border-radius: 28px;
-  background: var(--hero);
-  color: #fff;
+  border-radius: var(--r-lg);
+  background: var(--text);
+  color: var(--bg);
   text-align: center;
   box-shadow: var(--sh-2);
   animation: pop 0.3s ease-out;
@@ -2776,9 +2802,9 @@ a.cal-day:hover {
 .qtag {
   padding: 4px 12px;
   border-radius: 99px;
-  background: rgb(255 255 255 / 20%);
+  background: color-mix(in srgb, var(--bg) 16%, transparent);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .game-q {
@@ -2938,9 +2964,10 @@ a.cal-day:hover {
   padding: 6px 0;
 }
 
-.avatar-heart {
-  font-size: 22px;
-  color: var(--rose);
+.avatar-amp {
+  font-family: var(--serif);
+  font-size: 30px;
+  color: var(--muted);
 }
 
 .avatar-edit {
@@ -2974,8 +3001,8 @@ a.cal-day:hover {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--grad);
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
   box-shadow: 0 0 0 3px var(--surface);
 }
 
@@ -2992,7 +3019,7 @@ a.cal-day:hover {
   max-width: 460px;
   padding: 30px;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--sh-2);
 }
@@ -3008,16 +3035,13 @@ a.cal-day:hover {
   margin: 0;
 }
 
+/* OUR♥CAVE тэмдэг, доор нь нимгэн зураас */
 .auth-hero {
-  display: grid;
-  place-items: center;
-  width: 76px;
-  height: 76px;
-  margin: 0 auto;
-  border-radius: 26px;
-  background: var(--grad);
-  font-size: 38px;
-  box-shadow: 0 12px 26px rgb(224 67 109 / 35%);
+  display: flex;
+  justify-content: center;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--line);
+  color: var(--text);
 }
 
 /* ═══════════════ Цонх, мэдэгдэл ═══════════════ */
@@ -3119,36 +3143,6 @@ dialog::backdrop {
   }
 }
 
-.fly-heart {
-  position: fixed;
-  bottom: -40px;
-  z-index: 90;
-  pointer-events: none;
-  animation: fly 2.8s ease-in forwards;
-}
-
-@keyframes fly {
-  to {
-    opacity: 0;
-    transform: translateY(-112vh) rotate(var(--r));
-  }
-}
-
-.loading {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-}
-
-.loading.inline {
-  min-height: 50vh;
-}
-
-.pulse-heart {
-  font-size: 40px;
-  animation: beat 1.4s infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -3160,28 +3154,28 @@ dialog::backdrop {
 
 /* ═══════════════ Нууц өрөө (18+) — үргэлж бараан, "after dark" ═══════════════ */
 .vault {
-  --surface: #1d111a;
-  --surface-2: #261622;
-  --surface-3: #311c2b;
-  --text: #fbeef4;
-  --text-2: #e6cbd8;
-  --muted: #b393a6;
-  --line: #3a2333;
-  --line-2: #4b2d41;
-  --rose: #ff5c8a;
-  --rose-soft: rgb(255 92 138 / 16%);
-  --grad: linear-gradient(135deg, #ff5c8a 0%, #c2185b 55%, #6a1b9a 100%);
+  --surface: #1e1716;
+  --surface-2: #261d1c;
+  --surface-3: #302523;
+  --text: #f4ebe7;
+  --text-2: #dccbc5;
+  --muted: #a8948e;
+  --line: #372a28;
+  --line-2: #473633;
+  --rose: #d86a62;
+  --rose-soft: rgb(216 106 98 / 15%);
+  --on-rose: #ffffff;
+  --grad: #b8514a;
   --sh-1: 0 10px 30px rgb(0 0 0 / 35%);
   min-height: calc(100vh - 60px);
   padding: 28px clamp(16px, 3vw, 34px) 40px;
   border-radius: 30px;
   background:
-    radial-gradient(50rem 30rem at 100% 0%, rgb(255 60 120 / 24%), transparent 60%),
-    radial-gradient(40rem 30rem at 0% 100%, rgb(120 40 180 / 28%), transparent 60%),
-    #140a12;
+    radial-gradient(50rem 30rem at 100% 0%, rgb(150 45 45 / 16%), transparent 60%),
+    #151010;
   color: var(--text);
   color-scheme: dark;
-  box-shadow: 0 30px 80px rgb(40 0 30 / 30%);
+  box-shadow: 0 24px 60px rgb(30 10 10 / 25%);
 }
 
 @media (max-width: 900px) {
@@ -3233,11 +3227,9 @@ dialog::backdrop {
   place-items: center;
   width: 86px;
   height: 86px;
-  border-radius: 30px;
+  border-radius: 26px;
   background: var(--grad);
   color: #fff;
-  box-shadow: 0 0 40px rgb(255 92 138 / 45%);
-  animation: glow 3s ease-in-out infinite;
 }
 
 .pin-dots {
@@ -3366,9 +3358,9 @@ dialog::backdrop {
   justify-content: center;
   gap: 8px;
   aspect-ratio: 3 / 4;
-  border: 2px dashed rgb(255 92 138 / 45%);
+  border: 2px dashed rgb(216 106 98 / 40%);
   border-radius: 20px;
-  background: rgb(255 92 138 / 6%);
+  background: rgb(216 106 98 / 6%);
   color: var(--rose);
   font: inherit;
   font-weight: 800;
@@ -3377,7 +3369,7 @@ dialog::backdrop {
 }
 
 .vault-add:hover {
-  background: rgb(255 92 138 / 12%);
+  background: rgb(216 106 98 / 12%);
 }
 
 .vault-tile {
@@ -3394,7 +3386,7 @@ dialog::backdrop {
   padding: 0;
   border: 0;
   border-radius: 20px;
-  background: linear-gradient(160deg, #3a1530, #1d0f22);
+  background: #2a1f1e;
   cursor: pointer;
   box-shadow: 0 10px 30px rgb(0 0 0 / 35%);
 }
@@ -3422,9 +3414,7 @@ dialog::backdrop {
 }
 
 .vault-tile.sealed .vault-tile-btn {
-  background:
-    radial-gradient(80% 60% at 50% 30%, rgb(255 140 80 / 40%), transparent),
-    linear-gradient(160deg, #ff5c8a, #8e24aa);
+  background: linear-gradient(160deg, #6e2b27, #2b1716);
 }
 
 .burn-ico {
@@ -3549,13 +3539,11 @@ dialog::backdrop {
 }
 
 .qcard.spicy {
-  background:
-    radial-gradient(80% 100% at 0% 0%, rgb(255 90 120 / 60%), transparent 60%),
-    radial-gradient(80% 100% at 100% 100%, rgb(110 30 160 / 80%), transparent 60%),
-    linear-gradient(135deg, #3b0f2c, #1a0b24);
+  background: #241a19;
+  color: var(--text);
   box-shadow:
-    0 20px 50px rgb(0 0 0 / 40%),
-    inset 0 0 0 1px rgb(255 92 138 / 25%);
+    0 16px 40px rgb(0 0 0 / 35%),
+    inset 0 0 0 1px rgb(216 106 98 / 22%);
 }
 
 .vault-card {
@@ -3581,7 +3569,7 @@ dialog::backdrop {
 
 .wish-matches li {
   padding: 8px 14px;
-  border: 1px solid rgb(255 92 138 / 35%);
+  border: 1px solid rgb(216 106 98 / 35%);
   border-radius: 99px;
   background: var(--rose-soft);
   font-weight: 700;
@@ -3591,7 +3579,6 @@ dialog::backdrop {
   border-color: transparent;
   background: var(--grad);
   color: #fff;
-  box-shadow: 0 0 18px rgb(255 92 138 / 35%);
 }
 
 .wish-hot {
@@ -3670,12 +3657,6 @@ dialog::backdrop {
   }
 }
 
-@keyframes glow {
-  50% {
-    box-shadow: 0 0 64px rgb(255 92 138 / 65%);
-  }
-}
-
 /* ═══════════════ Танилцуулга (/welcome), нэвтрэх ═══════════════ */
 .welcome {
   max-width: 1100px;
@@ -3691,29 +3672,20 @@ dialog::backdrop {
   align-items: center;
   gap: 24px;
   padding: clamp(28px, 5vw, 56px);
-  border-radius: 32px;
-  background: var(--hero);
-  color: #fff;
-  box-shadow: var(--sh-2);
-  isolation: isolate;
-}
-
-.welcome-hero::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 360px;
-  height: 360px;
-  right: -80px;
-  top: -140px;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 10%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--sh-1);
 }
 
 .welcome-eyebrow {
-  margin: 0 0 10px;
-  font-weight: 800;
-  color: rgb(255 255 255 / 90%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-weight: 700;
+  color: var(--text-2);
 }
 
 .welcome-hero h1 {
@@ -3726,31 +3698,14 @@ dialog::backdrop {
 
 .welcome-hero h1 em {
   font-style: normal;
-  color: #ffd9e2;
+  color: var(--rose);
 }
 
 .welcome-sub {
   max-width: 460px;
   margin: 0 0 24px;
   font-size: 17px;
-  color: rgb(255 255 255 / 90%);
-}
-
-.welcome-cta {
-  background: #fff;
-  color: var(--rose);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 15%);
-}
-
-.welcome-login {
-  background: transparent;
-  color: #fff;
-  border-color: rgb(255 255 255 / 55%);
-}
-
-.welcome-login:hover {
-  color: #fff;
-  border-color: #fff;
+  color: var(--text-2);
 }
 
 .welcome-art {
@@ -3769,18 +3724,30 @@ dialog::backdrop {
   margin-left: -30px;
 }
 
+/* Зураг шиг: өглөөний ба шөнийн тэнгэр, буланд цаг */
 .welcome-ph {
-  display: grid;
-  place-items: center;
-  font-size: 56px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.welcome-ph span {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 28%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .welcome-ph.a {
-  background: linear-gradient(160deg, #ffd1b8, #ff8fab 60%, #8e5bb5);
+  background: linear-gradient(180deg, #e9d9c3 0%, #d8b48f 55%, #a8775a 100%);
 }
 
 .welcome-ph.b {
-  background: linear-gradient(160deg, #a7c4ff, #6a7bd6 60%, #3b2f6e);
+  background: linear-gradient(180deg, #1f2a3a 0%, #34465e 60%, #5a6a7d 100%);
 }
 
 @media (max-width: 760px) {
@@ -3822,9 +3789,9 @@ dialog::backdrop {
   place-items: center;
   width: 50px;
   height: 50px;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--surface-3);
-  font-size: 26px;
+  color: var(--text);
 }
 
 .welcome-feature h2 {
@@ -3847,7 +3814,7 @@ dialog::backdrop {
   gap: 16px;
   padding: 34px 20px;
   border: 1px solid var(--line);
-  border-radius: 32px;
+  border-radius: 24px;
   background: var(--surface);
   text-align: center;
 }
@@ -3888,9 +3855,9 @@ dialog::backdrop {
   height: 34px;
   margin: 0 auto 6px;
   border-radius: 50%;
-  background: var(--grad);
-  color: #fff;
-  font-weight: 800;
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 700;
 }
 
 .welcome-steps li span {
@@ -3947,4 +3914,1360 @@ dialog::backdrop {
   background: var(--bad);
   color: #fff;
   box-shadow: none;
+}
+
+/* ═══════════════ Ачаалал ═══════════════ */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── Брэнд: OUR♥CAVE (components/Brand.tsx) ── */
+.heart {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.5em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.wm-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  padding-bottom: 0.08em;
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+/* letter-spacing нь сүүлийн үсгийн ард зай үлдээдэг — зүрхийг голд нь барина */
+.wm-heart {
+  margin: 0 -0.02em 0 -0.08em;
+  transform: translateY(-0.04em);
+}
+
+.cave-mark {
+  flex: none;
+  overflow: visible;
+}
+
+.cave-heart {
+  transform-box: fill-box;
+  transform-origin: 50% 60%;
+}
+
+.cave-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Ачааллын үед агуй доторх зүрх зөөлөн цохилж, од гялалзана */
+.cave-mark.anim .cave-heart {
+  animation: soft-beat 1.4s ease-in-out infinite;
+}
+
+.cave-mark.anim .cave-spark {
+  animation: twinkle 2.8s ease-in-out infinite;
+}
+
+.boot .wordmark {
+  animation: fade-in 0.6s 0.1s both;
+}
+
+@keyframes soft-beat {
+  0%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.14);
+  }
+  32% {
+    transform: scale(1.04);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cave-mark.anim .cave-heart,
+  .cave-mark.anim .cave-spark,
+  .heart-beat {
+    animation: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.skel-page {
+  animation: fade-in 0.3s 0.12s both;
+}
+
+.skel-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.skel-lines {
+  display: grid;
+  flex: 1;
+  gap: 10px;
+}
+
+.skel {
+  display: block;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--surface-3) 0%, var(--surface-2) 50%, var(--surface-3) 100%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.skel-ico {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+}
+
+.skel-line {
+  height: 22px;
+}
+
+.skel-line.thin {
+  height: 12px;
+}
+
+.skel-line.w45 {
+  width: 45%;
+}
+
+.skel-line.w70 {
+  width: 70%;
+}
+
+.skel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.skel-card {
+  height: 150px;
+  border-radius: var(--r-lg);
+}
+
+.skel-card.tall {
+  grid-column: 1 / -1;
+  height: 210px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ═══════════════ "Санаж байна" ирэхэд ═══════════════ */
+.miss-ov {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(20 16 12 / 45%);
+  backdrop-filter: blur(6px);
+  animation: fade-in 0.25s ease-out;
+}
+
+.miss-ov-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 34px 24px 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--sh-3);
+  text-align: center;
+  animation: ov-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.miss-ov-card h2 {
+  margin: 4px 0 6px;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.miss-ov-card p {
+  margin: 0;
+}
+
+.miss-ov-eyebrow {
+  margin-top: 30px !important;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+
+.miss-ov-ripple {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto;
+}
+
+.miss-ov-ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--rose);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 2.4s ease-out infinite;
+}
+
+.miss-ov-ring:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.miss-ov-ring:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+.miss-ov-ripple .av {
+  position: relative;
+  animation: ov-pop 0.6s 0.1s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+.miss-ov-heart {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: var(--on-rose);
+  box-shadow: 0 0 0 3px var(--surface);
+  animation: ov-pop 0.5s 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+.miss-ov-heart svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+.miss-ov-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+@keyframes ov-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+}
+
+@keyframes ov-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* ═══════════════ Our taste (хамтын playlist) ═══════════════ */
+.song-add {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.song-add p {
+  margin: 0;
+}
+
+.song-search {
+  position: relative;
+  display: flex;
+  gap: 10px;
+}
+
+.song-search input {
+  flex: 1;
+  min-width: 0;
+  padding-left: 40px !important;
+}
+
+.song-add-ico {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  display: grid;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.yt-results {
+  display: grid;
+  gap: 2px;
+  margin: 0 -8px;
+  padding: 0;
+  list-style: none;
+}
+
+.yt-results li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 12px;
+}
+
+.yt-results li:hover {
+  background: var(--surface-2);
+}
+
+.yt-thumb {
+  flex: none;
+  width: 80px;
+  height: 45px;
+  border-radius: 6px;
+  background: var(--surface-3);
+  object-fit: cover;
+}
+
+.yt-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.yt-text b,
+.yt-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yt-text b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.yt-results .btn {
+  flex: none;
+}
+
+@media (max-width: 560px) {
+  .yt-thumb {
+    width: 64px;
+    height: 36px;
+  }
+
+  .yt-add-label {
+    display: none;
+  }
+}
+
+.music {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+
+@media (max-width: 960px) {
+  .music {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.now-playing {
+  position: sticky;
+  top: 20px;
+  padding: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 960px) {
+  .now-playing {
+    position: static;
+  }
+}
+
+.np-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #0d0c0b;
+}
+
+.np-host,
+.np-host iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.np-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: #0d0c0b;
+  cursor: pointer;
+}
+
+.np-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.np-play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  color: #1d1a17;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 30%);
+  transition: transform 0.15s;
+}
+
+.np-cover:hover .np-play {
+  transform: scale(1.06);
+}
+
+.np-play svg,
+.np-main svg {
+  fill: currentColor;
+}
+
+.np-loading {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: 13px;
+}
+
+.np-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 16px 18px 18px;
+}
+
+.np-text {
+  display: grid;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.np-text b {
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.np-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.np-controls .icon-btn {
+  min-width: 40px;
+  height: 40px;
+}
+
+.np-main {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+
+.np-main:active {
+  transform: scale(0.94);
+}
+
+.tracks {
+  container-type: inline-size;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+  list-style: none;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 0;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.track:hover {
+  background: var(--surface-2);
+}
+
+.track.current {
+  background: var(--surface-3);
+}
+
+.track-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.track-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.track.current .track-num {
+  color: var(--rose);
+}
+
+.track-thumb {
+  flex: none;
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--surface-3);
+  object-fit: cover;
+}
+
+.track-text {
+  display: grid;
+  min-width: 0;
+}
+
+.track-text b,
+.track-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-text b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.track.current .track-text b {
+  color: var(--rose);
+}
+
+.track-meta {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.track-meta .av {
+  margin-right: 4px;
+}
+
+.track-meta .icon-btn {
+  gap: 4px;
+  grid-auto-flow: column;
+}
+
+.track-meta .icon-btn.liked {
+  background: transparent;
+  color: var(--rose);
+}
+
+.track-meta .icon-btn.liked svg {
+  fill: currentColor;
+}
+
+.track-when {
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+/* Жагсаалт нарийн үед нэрэнд илүү зай үлдээнэ */
+@container (max-width: 620px) {
+  .track-when {
+    display: none;
+  }
+}
+
+@container (max-width: 420px) {
+  .track-meta .av {
+    display: none;
+  }
+
+  .track-thumb {
+    width: 52px;
+    height: 34px;
+  }
+}
+
+/* Тоглож буйг илэрхийлэх жижиг баганууд */
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.eq i {
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--rose);
+  transform-origin: bottom;
+  animation: eq 0.9s ease-in-out infinite;
+}
+
+.eq i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.eq i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* ═══════════════ Газрын зураг ═══════════════ */
+.map-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.map {
+  position: relative;
+  z-index: 0;
+  height: 300px;
+  margin: 2px -4px 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-3);
+}
+
+@media (max-width: 720px) {
+  .map {
+    height: 250px;
+  }
+}
+
+/* OSM-ийн тод өнгийг цаас шиг бүдэг болгоно */
+.map-tiles {
+  filter: grayscale(0.6) sepia(0.14) brightness(1.03) contrast(0.9);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .map-tiles {
+    filter: invert(1) hue-rotate(180deg) grayscale(0.7) brightness(0.85) contrast(0.85);
+  }
+}
+
+:root[data-theme="dark"] .map-tiles {
+  filter: invert(1) hue-rotate(180deg) grayscale(0.7) brightness(0.85) contrast(0.85);
+}
+
+.map .leaflet-control-attribution {
+  padding: 1px 6px;
+  border-radius: 6px 0 0 0;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 10px;
+}
+
+.map .leaflet-control-attribution a {
+  color: inherit;
+}
+
+.map-pin-wrap {
+  position: relative;
+  background: none;
+  border: 0;
+}
+
+.map-pin {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 22%),
+    0 0 0 1px rgb(0 0 0 / 6%);
+}
+
+.map-pin .av {
+  width: 34px;
+  height: 34px;
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.map-city {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+  transform: translateX(-50%);
+}
+
+.map-km-wrap {
+  background: none;
+  border: 0;
+}
+
+.map-km {
+  position: absolute;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  transform: translate(-50%, -150%);
+}
+
+.map-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.map-facts div {
+  display: grid;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.map-facts b {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.map-facts span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* ═══════════════ Апп ба мэдэгдэл ═══════════════ */
+.setup-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px 16px;
+}
+
+@media (max-width: 720px) {
+  .setup-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .setup-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+.setup-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.setup-text {
+  display: grid;
+  gap: 2px;
+}
+
+.setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Апп суулгах заавар (InstallGuide) — төхөөрөмж бүрт өөр ── */
+.ig-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: rgb(20 16 12 / 45%);
+  backdrop-filter: blur(3px);
+  animation: fade-in 0.2s both;
+}
+
+/* Сум доод талд бол цонхыг дээш, дээд талд бол доош шахна */
+.ig-scrim.to-bottom,
+.ig-scrim.to-bottom-right {
+  align-items: start;
+  padding-top: calc(40px + env(safe-area-inset-top));
+}
+
+.ig-scrim.to-top-right {
+  align-items: end;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
+}
+
+.ig-sheet {
+  width: min(440px, 100%);
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--sh-3);
+  animation: ov-rise 0.32s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.ig-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ig-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.ig-head p {
+  margin: 2px 0 0;
+}
+
+.ig-app {
+  flex: none;
+  border-radius: 12px;
+  box-shadow: var(--sh-1);
+}
+
+.ig-warn {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--rose-soft);
+  color: var(--text-2);
+  font-size: 13.5px;
+}
+
+.ig-steps {
+  display: grid;
+  gap: 4px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ig;
+}
+
+.ig-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--text-2);
+  counter-increment: ig;
+}
+
+.ig-steps li + li {
+  border-top: 1px dashed var(--line);
+}
+
+.ig-steps b {
+  color: var(--text);
+}
+
+/* Алхмын дугаар дүрсний буланд */
+.ig-ico {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--surface-3);
+  color: var(--rose);
+}
+
+.ig-ico::after {
+  content: counter(ig);
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: var(--on-rose);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ig-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ig-actions .btn {
+  flex: 1 1 140px;
+}
+
+/* Браузерын товч руу заах сум */
+.ig-arrow {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--rose);
+  box-shadow: var(--sh-2);
+  pointer-events: none;
+}
+
+.ig-arrow.bottom {
+  left: calc(50% - 27px);
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  animation: ig-nudge-down 1.2s ease-in-out infinite;
+}
+
+.ig-arrow.bottom-right {
+  right: 18px;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  animation: ig-nudge-down 1.2s ease-in-out infinite;
+}
+
+.ig-arrow.top-right {
+  top: calc(14px + env(safe-area-inset-top));
+  right: 18px;
+  animation: ig-nudge-up 1.2s ease-in-out infinite;
+}
+
+.ig-arrow.top-right svg {
+  transform: rotate(180deg);
+}
+
+@keyframes ig-nudge-down {
+  50% {
+    translate: 0 8px;
+  }
+}
+
+@keyframes ig-nudge-up {
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-arrow {
+    animation: none !important;
+  }
+}
+
+.app-setup h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+
+.setup-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.setup-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.setup-row > div:first-child {
+  flex: 1 1 260px;
+}
+
+/* Зурвасын "таалагдлаа" — дүүрсэн зүрх */
+.icon-btn.heart {
+  gap: 4px;
+  grid-auto-flow: column;
+}
+
+.icon-btn.heart.on {
+  background: transparent;
+  color: var(--rose);
+}
+
+.icon-btn.heart.on svg {
+  fill: currentColor;
+}
+
+/* ═══════════════ Арын өнгө сонгох ═══════════════ */
+.sub-h {
+  margin: 22px 0 4px;
+  font-size: 14.5px;
+}
+
+.bg-picker {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.bg-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bg-swatch {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 76px;
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bg-swatch:hover {
+  background: var(--surface-2);
+}
+
+.bg-swatch.on {
+  border-color: var(--line-2);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.bg-dot {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%);
+}
+
+.bg-dot.plain {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+.bg-swatch.on .bg-dot {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--text);
+}
+
+.bg-custom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.bg-custom.on {
+  border-color: var(--text);
+}
+
+.bg-color {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  cursor: pointer;
+}
+
+.bg-color input {
+  width: 56px;
+  height: 56px;
+  margin: -11px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ═══════════════ Зүрх, хосын жижиг хээ (энд тэнд, бага зэрэг) ═══════════════ */
+.side-logo {
+  padding: 2px 10px 18px;
+  color: var(--text-2);
+}
+
+.brand-name .heart {
+  margin: 0 1px;
+  transform: translateY(-1px);
+}
+
+/* Нэрсийн хоорондох зүрх — 4 секунд тутамд нэг зөөлөн цохилно */
+.heart-beat {
+  animation: soft-beat 4s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+.hero-title .heart {
+  width: 0.56em;
+  height: 0.56em;
+  margin: 0 0.06em;
+  transform: translateY(-0.05em);
+}
+
+.hero-avatars {
+  position: relative;
+}
+
+/* Давхцсан хоёр зургийн доор жижиг зүрх */
+.hero-avatars-heart {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+  transform: translateX(-50%);
+}
+
+/* Газрын зураг дээр нумын дагуу аялах зүрх */
+.map-heart-wrap {
+  overflow: visible;
+}
+
+.map-heart {
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: var(--rose);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 25%));
+  transform: translate(-50%, -55%);
+}
+
+.map-heart svg {
+  display: block;
+}
+
+/* "Санаж байна" дарахад товчноос жижиг зүрхнүүд хөөрнө */
+.miss-big .miss-heart,
+.miss-pill,
+.miss-icon {
+  position: relative;
+}
+
+.heart-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heart-burst > span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  line-height: 0;
+  opacity: 0;
+  animation: heart-up 1.15s cubic-bezier(0.2, 0.7, 0.3, 1) calc(var(--i) * 55ms) forwards;
+}
+
+.heart-burst .heart path {
+  fill: var(--rose);
+  stroke: none;
+}
+
+@keyframes heart-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% - var(--y))) scale(1) rotate(var(--r));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-burst {
+    display: none;
+  }
+}
+
+/* Хуудас бүрийн доорх гарын үсэг */
+.couple-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 6px;
+  margin-top: 44px;
+  font-family: var(--hand);
+  font-size: 17px;
+  color: var(--muted);
+}
+
+.couple-foot span {
+  font-family: var(--sans);
+  font-size: 13px;
 }

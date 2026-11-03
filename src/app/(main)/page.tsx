@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import { Heart } from "@/components/Brand";
 import Clocks from "@/components/Clocks";
 import Countdown from "@/components/Countdown";
+import DistanceMap from "@/components/DistanceMap";
 import Icon from "@/components/Icon";
 import IdeaRoller from "@/components/IdeaRoller";
+import AppSetup from "@/components/AppSetup";
 import InviteLink from "@/components/InviteLink";
 import MissButton from "@/components/MissButton";
 import MomentPair from "@/components/MomentPair";
@@ -11,8 +14,16 @@ import QotdCard from "@/components/QotdCard";
 import { DATE_IDEAS, hashStr, qotdDay } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
 import { leftText, upcomingEvents } from "@/lib/events";
-import { dayKey, daysBetween, fmtKey, fmtKeyShort, fmtTime, rel, startOfDay, tzParts, utcKey, weekdayOfKey, ymd, ymdText } from "@/lib/time";
+import { vapidPublicKey } from "@/lib/push";
+import { dayKey, daysBetween, distanceKm, fmtKey, fmtKeyShort, fmtTime, rel, startOfDay, tzParts, utcKey, weekdayOfKey, ymd, ymdText } from "@/lib/time";
 import type { Who } from "@/lib/types";
+
+/** Онгоцоор ойролцоогоор (800 км/ц + хөөрөх/буух хагас цаг) */
+function flightText(km: number) {
+  const min = Math.round((km / 800 + 0.5) * 60);
+  const h = Math.floor(min / 60);
+  return h ? `~${h}ц ${min % 60}м` : `~${min}м`;
+}
 
 function greeting(h: number) {
   if (h >= 5 && h < 11) return "Өглөөний мэнд";
@@ -55,6 +66,9 @@ export default async function HomePage(props: PageProps<"/">) {
   const ideas = [...DATE_IDEAS, ...customIdeas.map((i) => ({ emoji: i.emoji, text: i.text }))];
   const [memCount, noteCount, letterCount, momentCount, bucketAll, bucketDone] = stats;
   const hour = tzParts(tz, now).h;
+  const hasCoords = (c: typeof cityA) => c != null && c.lat != null && c.lon != null;
+  const mapCities = cityA && cityB && hasCoords(cityA) && hasCoords(cityB) ? { a: cityA, b: cityB } : null;
+  const km = mapCities ? Math.round(distanceKm({ lat: cityA!.lat!, lon: cityA!.lon! }, { lat: cityB!.lat!, lon: cityB!.lon! })) : 0;
 
   return (
     <div className="bento">
@@ -72,7 +86,7 @@ export default async function HomePage(props: PageProps<"/">) {
             {greeting(hour)}, {names[me]} · {fmtKeyShort(today)}, {weekdayOfKey(today)}
           </p>
           <h1 className="hero-title">
-            {names.a} <em>&</em> {names.b}
+            {names.a} <Heart size={30} shine className="heart-beat" /> {names.b}
           </h1>
           {start && together < 0 ? (
             <p className="hero-sub">
@@ -90,12 +104,15 @@ export default async function HomePage(props: PageProps<"/">) {
         </div>
         <div className="hero-avatars" aria-hidden="true">
           <Avatar who="a" name={names.a} size="xl" />
-          <span className="hero-heart">
-            <Icon name="heart" size={22} />
-          </span>
           <Avatar who="b" name={names.b} size="xl" />
+          <span className="hero-avatars-heart">
+            <Heart size={18} shine />
+          </span>
         </div>
       </section>
+
+      {/* ── Утсанд суулгах / мэдэгдэл асаах санал (хэрэгтэй үед л) ── */}
+      <AppSetup vapidKey={vapidPublicKey()} variant="card" />
 
       {/* ── Өнөөдрийн мөч ── */}
       <section className="card c7 r2 moments-card">
@@ -147,9 +164,39 @@ export default async function HomePage(props: PageProps<"/">) {
         )}
       </section>
 
-      {/* ── Өдрийн асуулт ── */}
-      <section className="card c7">
-        <QotdCard ctx={ctx} answers={qotd} day={qday} />
+      {/* ── Хоорондын зай (газрын зураг) ── */}
+      <section className="card c7 map-card">
+        <div className="card-head">
+          <h2>
+            <Icon name="map" size={18} /> Бидний хоорондох зай
+          </h2>
+        </div>
+        {mapCities ? (
+          <>
+            <DistanceMap cities={mapCities} names={names} km={km} />
+            <div className="map-facts">
+              <div>
+                <b>{km.toLocaleString("en-US")} км</b>
+                <span>хоорондын зай</span>
+              </div>
+              <div>
+                <b>{flightText(km)}</b>
+                <span>онгоцоор</span>
+              </div>
+              <div>
+                <b>{((km / 299792.458) * 1000).toFixed(1)} мс</b>
+                <span>гэрлийн хурдаар</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="empty-inline">
+            <p className="muted">Хоёулаа аль хотод байгаагаа сонговол газрын зураг дээр тэмдэглэж, хоорондын зайг харуулна.</p>
+            <Link className="btn ghost sm" href="/settings">
+              Хот сонгох
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* ── Хоёрын цаг ── */}
@@ -169,6 +216,11 @@ export default async function HomePage(props: PageProps<"/">) {
             </Link>
           </div>
         )}
+      </section>
+
+      {/* ── Өдрийн асуулт ── */}
+      <section className="card c12">
+        <QotdCard ctx={ctx} answers={qotd} day={qday} />
       </section>
 
       {/* ── Сүүлийн зурвас ── */}

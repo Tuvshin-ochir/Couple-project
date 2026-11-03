@@ -1,6 +1,7 @@
 "use client";
 
 import { toast, useMounted } from "@/lib/fx";
+import { SITE_NAME } from "@/lib/site";
 
 /** Хайртдаа илгээх урилгын холбоос (/login?c=<хосын нэр>) */
 export default function InviteLink({ handle }: { handle: string }) {
@@ -27,7 +28,7 @@ export default function InviteLink({ handle }: { handle: string }) {
         <button
           type="button"
           className="btn line sm"
-          onClick={() => navigator.share({ title: "Бид хоёр 💞", text: "Манай хосын орон зайд нэгдээрэй", url }).catch(() => {})}
+          onClick={() => navigator.share({ title: SITE_NAME, text: "Манай хосын орон зайд нэгдээрэй", url }).catch(() => {})}
         >
           Илгээх
         </button>

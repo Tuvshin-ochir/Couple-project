@@ -56,7 +56,7 @@ export default function QotdCard({ ctx, answers, day }: { ctx: Ctx; answers: Qot
                 ? `🔒 ${names[partner]} хариулсан — чи хариулбал харагдана`
                 : "Хоёулаа хариулсны дараа бие биенийхээ хариултыг харна"}
             </span>
-            <SubmitButton burst={theirs ? 8 : 0}>Хариулах</SubmitButton>
+            <SubmitButton>Хариулах</SubmitButton>
           </div>
         </form>
       )}

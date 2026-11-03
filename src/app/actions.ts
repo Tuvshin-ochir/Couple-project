@@ -3,10 +3,15 @@
 import { cookies } from "next/headers";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import type { Couple } from "@/generated/prisma/client";
 import { prisma, scoped } from "@/lib/db";
 import { endSession, hashPassword, readSession, startSession, verifyPassword } from "@/lib/auth";
+import { parseBg } from "@/lib/backgrounds";
 import { parseCity, viewerTz } from "@/lib/ctx";
 import { closeVault, openVault, vaultUntil } from "@/lib/vault";
+import { pushTo, type PushPayload } from "@/lib/push";
+import { SITE_NAME } from "@/lib/site";
 import {
   CITIES,
   DAY_TYPES,
@@ -20,10 +25,11 @@ import {
   WISHES,
   WOULD_YOU_RATHER,
   dailyQuestion,
+  moodOf,
   qotdDay,
 } from "@/lib/content";
 import { dayKey, isDayKey, keyToUTC, validTz } from "@/lib/time";
-import { isWho, type City } from "@/lib/types";
+import { isWho, other, type City, type Who } from "@/lib/types";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
 
@@ -40,6 +46,12 @@ async function auth() {
 async function done(cid: string) {
   await prisma.couple.update({ where: { id: cid }, data: { version: { increment: 1 } } });
   refresh();
+}
+
+/** Хайртад утасны мэдэгдэл — хариу буцсаны дараа илгээгдэнэ (товч удаашрахгүй) */
+function notifyPartner(s: Couple, me: Who, make: (myName: string) => PushPayload) {
+  const name = me === "a" ? s.nameA : s.nameB;
+  after(() => pushTo(s.id, other(me), make(name)));
 }
 
 const str = (fd: FormData, key: string, max = 2000) => String(fd.get(key) ?? "").trim().slice(0, max);
@@ -110,9 +122,23 @@ export async function deleteCouple(_: FormState, fd: FormData): Promise<FormStat
 
 // ───────── Санаж байна ─────────
 
+const MISS_LINES = [
+  "Хайр чинь чамайг санаж байна гэнээ 🥺",
+  "Яг одоо чамайг бодож байна 💭",
+  "Чамд нэг том тэврэлт илгээлээ 🤗",
+  "Чамайг маш их санаж байна",
+  "Чамгүй өдөр их урт байна гэнээ",
+];
+
 export async function sendNudge() {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   await db.nudge.create({ data: { coupleId: cid, by: me } });
+  notifyPartner(s, me, (name) => ({
+    title: name,
+    body: MISS_LINES[Math.floor(Math.random() * MISS_LINES.length)],
+    url: `/?miss=${Date.now()}`,
+    tag: "miss",
+  }));
   await db.nudge.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 60 * 864e5) } } });
   await done(cid);
 }
@@ -120,13 +146,14 @@ export async function sendNudge() {
 // ───────── Зурвас ─────────
 
 export async function addNote(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const text = str(fd, "text", 2000);
   if (!text) return;
   const color = str(fd, "color", 10);
   await db.note.create({
     data: { coupleId: cid, by: me, text, color: (NOTE_COLORS as readonly string[]).includes(color) ? color : "pink" },
   });
+  notifyPartner(s, me, (name) => ({ title: `${name} зурвас үлдээлээ`, body: text.slice(0, 140), url: "/notes", tag: "note" }));
   await done(cid);
 }
 
@@ -147,11 +174,17 @@ export async function deleteNote(id: string) {
 // ───────── Нээх захидал ─────────
 
 export async function addLetter(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const title = str(fd, "title", 80);
   const body = str(fd, "body", 8000);
   if (!title || !body) return;
   await db.letter.create({ data: { coupleId: cid, by: me, title, body } });
+  notifyPartner(s, me, (name) => ({
+    title: `${name} чамд захидал бичлээ ✉️`,
+    body: `"${title}" — нээх үедээ уншаарай`,
+    url: "/notes?tab=letters",
+    tag: "letter",
+  }));
   await done(cid);
 }
 
@@ -271,22 +304,33 @@ export async function postMoment(fd: FormData): Promise<FormState> {
     filter: PHOTO_FILTERS.some((f) => f.key === filter) ? filter : "none",
     ...image,
   };
+  const existed = await db.moment.findUnique({ where: { coupleId_by_day: { coupleId: cid, by: me, day } }, select: { id: true } });
   await db.moment.upsert({
     where: { coupleId_by_day: { coupleId: cid, by: me, day } },
     create: { coupleId: cid, by: me, day, ...data },
     update: data,
   });
+  if (!existed)
+    notifyPartner(s, me, (name) => ({
+      title: `${name} өдрийн мөчөө хуваалцлаа 📸`,
+      body: data.caption || moodOf(mood).label,
+      url: "/moment",
+      tag: "moment",
+    }));
   await done(cid);
   return { ok: true };
 }
 
 /** Хайртынхаа мөчид эможи үлдээх (дахин дарвал арилна) */
 export async function reactMoment(id: string, emoji: string) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   if (!REACTIONS.includes(emoji)) return;
   const m = await db.moment.findUnique({ where: { id }, select: { by: true, reaction: true } });
   if (!m || m.by === me) return;
-  await db.moment.update({ where: { id }, data: { reaction: m.reaction === emoji ? null : emoji } });
+  const removing = m.reaction === emoji;
+  await db.moment.update({ where: { id }, data: { reaction: removing ? null : emoji } });
+  if (!removing)
+    notifyPartner(s, me, (name) => ({ title: `${name} чиний мөчид ${emoji} үлдээлээ`, body: "Өдрийн мөч", url: "/moment", tag: "react" }));
   await done(cid);
 }
 
@@ -403,20 +447,34 @@ export async function deleteDateLog(id: string) {
 }
 
 export async function startSync(seconds: number) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   if (!SYNC_SECONDS.includes(seconds)) return;
   await db.syncTimer.deleteMany({});
   await db.syncTimer.create({ data: { coupleId: cid, by: me, at: new Date(Date.now() + seconds * 1000) } });
+  notifyPartner(s, me, (name) => ({
+    title: `${name} зэрэг эхлүүлэх тоолуур асаалаа`,
+    body: `${seconds} секундийн дараа эхэлнэ — одоо нээгээрэй`,
+    url: "/dates",
+    tag: "sync",
+  }));
   await done(cid);
 }
 
 // ───────── Тоглоом ─────────
 
 export async function answerQotd(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const text = str(fd, "text", 2000);
   if (!text) return;
   const day = qotdDay();
+  const existed = await db.qotdAnswer.findUnique({ where: { coupleId_day_by: { coupleId: cid, day, by: me } }, select: { id: true } });
+  if (!existed)
+    notifyPartner(s, me, (name) => ({
+      title: `${name} өнөөдрийн асуултад хариуллаа`,
+      body: "Чи ч бас хариулбал бие биенийхээ хариултыг харна",
+      url: "/games",
+      tag: "qotd",
+    }));
   await db.qotdAnswer.upsert({
     where: { coupleId_day_by: { coupleId: cid, day, by: me } },
     create: { coupleId: cid, by: me, day, question: dailyQuestion(day), text },
@@ -515,6 +573,14 @@ export async function saveProfile(_: FormState, fd: FormData): Promise<FormState
   return { ok: true };
 }
 
+/** Арын градиент — хоёулангийнх нь дэлгэц дээр адилхан харагдана */
+export async function saveBackground(value: string | null) {
+  const { cid } = await auth();
+  const bg = parseBg(value);
+  await prisma.couple.update({ where: { id: cid }, data: { bg: bg ? bg.join(",") : null } });
+  await done(cid);
+}
+
 export async function changePassword(_: FormState, fd: FormData): Promise<FormState> {
   const { s, me, cid } = await auth();
   if (!verifyPassword(String(fd.get("current") ?? ""), s.passwordHash)) return { error: "Одоогийн нууц үг буруу байна" };
@@ -586,7 +652,7 @@ export async function resetVaultPin(_: FormState, fd: FormData): Promise<FormSta
 }
 
 export async function addVaultPhoto(fd: FormData): Promise<FormState> {
-  const { me, cid, db } = await vaultAuth();
+  const { s, me, cid, db } = await vaultAuth();
   let photo, thumb;
   try {
     photo = await imageFrom(fd, "photo", 4_000_000);
@@ -605,6 +671,8 @@ export async function addVaultPhoto(fd: FormData): Promise<FormState> {
       viewOnce: fd.get("viewOnce") === "1",
     },
   });
+  // Агуулгыг дэлгэцэн дээр ил гаргахгүй — нэр ч оруулахгүй
+  notifyPartner(s, me, () => ({ title: "🔒 Нууц өрөөнд шинэ зүйл ирлээ", body: "Нээж харах уу? 😏", url: "/vault", tag: "vault" }));
   await done(cid);
   return { ok: true };
 }
@@ -642,4 +710,80 @@ export async function answerWish(item: number, answer: number) {
     update: { answer },
   });
   await done(cid);
+}
+
+// ───────── Our taste — хамтын playlist (YouTube) ─────────
+
+const YT_ID =
+  /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+
+export async function addSong(fd: FormData): Promise<FormState> {
+  const { s, me, cid, db } = await auth();
+  const raw = str(fd, "url", 300);
+  const videoId = raw.match(YT_ID)?.[1] ?? (/^[A-Za-z0-9_-]{11}$/.test(raw) ? raw : null);
+  if (!videoId) return { error: "YouTube холбоос буруу байна (жишээ: https://youtu.be/…)" };
+  if (await db.song.findFirst({ where: { videoId }, select: { id: true } })) return { error: "Энэ дуу playlist-д аль хэдийн байна" };
+  // Нэр, дуучны нэрийг YouTube oEmbed-ээс авна (API түлхүүр хэрэггүй)
+  let title = "YouTube дуу";
+  let author = "";
+  try {
+    const r = await fetch(
+      `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`,
+      { signal: AbortSignal.timeout(5000) },
+    );
+    if (r.ok) {
+      const j = (await r.json()) as { title?: string; author_name?: string };
+      title = String(j.title || title).slice(0, 150);
+      author = String(j.author_name || "").slice(0, 80);
+    } else if ([401, 403, 404].includes(r.status)) {
+      return { error: "Энэ видеог сайт дотор тоглуулах боломжгүй (хаалттай, устсан эсвэл embed хориотой)" };
+    }
+  } catch {
+    // сүлжээний алдаа — нэргүйгээр нэмнэ
+  }
+  await db.song.create({ data: { coupleId: cid, by: me, videoId, title, author, note: str(fd, "note", 140) } });
+  notifyPartner(s, me, (name) => ({ title: `${name} шинэ дуу нэмлээ 🎵`, body: title, url: "/music", tag: "song" }));
+  await done(cid);
+  return { ok: true };
+}
+
+export async function toggleSongLike(id: string) {
+  const { me, cid, db } = await auth();
+  const song = await db.song.findUnique({ where: { id }, select: { likedA: true, likedB: true } });
+  if (!song) return;
+  await db.song.update({ where: { id }, data: me === "a" ? { likedA: !song.likedA } : { likedB: !song.likedB } });
+  await done(cid);
+}
+
+export async function deleteSong(id: string) {
+  const { cid, db } = await auth();
+  await db.song.deleteMany({ where: { id } });
+  await done(cid);
+}
+
+// ───────── Утасны мэдэгдэл (push) ─────────
+
+type PushSub = { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
+
+export async function savePushSubscription(sub: PushSub): Promise<FormState> {
+  const { me, cid } = await auth();
+  const { endpoint, keys } = sub ?? {};
+  if (!endpoint?.startsWith("https://") || !keys?.p256dh || !keys?.auth) return { error: "Мэдэгдлийн бүртгэл буруу байна" };
+  // Нэг төхөөрөмж өмнө нь өөр хүн/хосоор бүртгэгдсэн байж болно — шинээр оноо
+  await prisma.pushSubscription.deleteMany({ where: { endpoint } });
+  await prisma.pushSubscription.create({
+    data: { coupleId: cid, who: me, endpoint: endpoint.slice(0, 1000), p256dh: keys.p256dh.slice(0, 200), auth: keys.auth.slice(0, 100) },
+  });
+  return { ok: true };
+}
+
+export async function removePushSubscription(endpoint: string) {
+  const { cid } = await auth();
+  await prisma.pushSubscription.deleteMany({ where: { endpoint, coupleId: cid } });
+}
+
+/** Өөрийн төхөөрөмж рүү туршилтын мэдэгдэл */
+export async function sendTestPush() {
+  const { s, me } = await auth();
+  await pushTo(s.id, me, { title: SITE_NAME, body: "Мэдэгдэл ажиллаж байна ✓", url: "/settings", tag: "test" });
 }

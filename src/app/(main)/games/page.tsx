@@ -32,7 +32,7 @@ export default async function GamesPage(props: PageProps<"/games">) {
 
   return (
     <>
-      <PageHead emoji="🎲" title="Хосын тоглоом" sub="Бие биенээ илүү сайн таньж мэдэх асуулт, тоглоомууд." />
+      <PageHead icon="dice" title="Хосын тоглоом" sub="Бие биенээ илүү сайн таньж мэдэх асуулт, тоглоомууд." />
       <Tabs items={TABS} current={tab} href={(k) => (k === "qotd" ? "/games" : `/games?tab=${k}`)} />
       {tab === "qotd" && <Qotd ctx={ctx} />}
       {tab === "cards" && <QuestionCards />}
@@ -148,7 +148,7 @@ async function ChoiceGame({ ctx, game, q }: { ctx: Ctx; game: "wyr" | "who"; q: 
             : !theirs
               ? `⏳ ${names[partner]} хараахан хариулаагүй`
               : mine.choice === theirs.choice
-                ? "💞 Ижилхэн бодолтой байна!"
+                ? "Ижилхэн бодолтой байна!"
                 : "🙈 Өөр өөр бодолтой байна — яагаад гэдгээ ярилцаарай"}
         </p>
         <div className="row between">
@@ -233,7 +233,7 @@ async function Quiz({ ctx }: { ctx: Ctx }) {
                   <div className="row">
                     <span className="small muted">Таасан уу?</span>
                     <form action={judgeQuiz.bind(null, x.id, true)}>
-                      <SubmitButton className="btn sm" burst={8}>
+                      <SubmitButton className="btn sm">
                         ✓ Зөв
                       </SubmitButton>
                     </form>

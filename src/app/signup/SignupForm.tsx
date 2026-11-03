@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { createCouple } from "@/app/actions";
+import { Wordmark } from "@/components/Brand";
 
 /** Монгол нэрийг латин хосын нэр болгох санал (хэрэглэгч засаж болно) */
 const TRANSLIT: Record<string, string> = {
@@ -28,8 +29,8 @@ export default function SignupForm() {
 
   return (
     <form action={action} className="auth-card stack">
-      <div className="auth-hero" aria-hidden="true">
-        💞
+      <div className="auth-hero">
+        <Wordmark size={15} />
       </div>
       <h1 className="center">Хосоо бүртгүүлэх</h1>
       <p className="center muted">Алсын зайн хайрын тань жижигхэн гэр. Хэдхэн зүйл тохируулъя.</p>
@@ -102,7 +103,7 @@ export default function SignupForm() {
       <p className="small muted">Хоёулаа нэг нууц үг ашиглана. Хайртдаа хэлж өгөөрэй.</p>
       {state?.error && <p className="err">{state.error}</p>}
       <button className="btn wide" disabled={pending}>
-        {pending ? "Түр хүлээнэ үү…" : "Эхлэх 💞"}
+        {pending ? "Түр хүлээнэ үү…" : "Эхлэх"}
       </button>
       <p className="center small">
         Аль хэдийн бүртгэлтэй юу? <Link href="/login">Нэвтрэх</Link>

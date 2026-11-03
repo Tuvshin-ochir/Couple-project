@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { addMemory } from "@/app/actions";
-import { compressImage, hearts, pulseNow, toast } from "@/lib/fx";
+import { compressImage, pulseNow, toast } from "@/lib/fx";
 
 const MAX_PHOTOS = 6;
 
@@ -51,7 +51,6 @@ export default function MemoryForm({ today }: { today: string }) {
       setError("");
       setOpen(false);
       toast("📸 Дурсамж хадгалагдлаа");
-      hearts(8);
       pulseNow();
     });
   }

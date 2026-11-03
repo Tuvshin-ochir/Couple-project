@@ -1,4 +1,4 @@
-// Клиент талын жижиг эффектүүд: мэдэгдэл (toast), зүрхний бороо, цаг тоолуур.
+// Клиент талын жижиг туслахууд: мэдэгдэл (toast), цаг тоолуур, зураг жижигрүүлэх.
 import { useSyncExternalStore } from "react";
 
 export function toast(msg: string, kind: "ok" | "error" = "ok") {
@@ -7,23 +7,6 @@ export function toast(msg: string, kind: "ok" | "error" = "ok") {
 
 /** Live компонентод шууд шинэчлэлт шалгуулах дохио */
 export const pulseNow = () => window.dispatchEvent(new Event("bh:pulse"));
-
-const HEARTS = ["💗", "💖", "💕", "❤️", "💞"];
-
-export function hearts(n = 10) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  for (let i = 0; i < n; i++) {
-    const h = document.createElement("span");
-    h.className = "fly-heart";
-    h.textContent = HEARTS[i % HEARTS.length];
-    h.style.left = `${Math.random() * 100}vw`;
-    h.style.animationDelay = `${Math.random() * 0.6}s`;
-    h.style.fontSize = `${18 + Math.random() * 22}px`;
-    h.style.setProperty("--r", `${Math.random() * 60 - 30}deg`);
-    document.body.appendChild(h);
-    setTimeout(() => h.remove(), 3600);
-  }
-}
 
 // Нэг интервалыг олон компонент хуваалцана. Сервер дээр 0 буцаадаг тул
 // hydration-ий зөрүү гарахгүй — клиент дээр холбогдмогц жинхэнэ цаг орж ирнэ.

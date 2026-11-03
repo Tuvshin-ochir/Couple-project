@@ -22,7 +22,7 @@ export default async function NotesPage(props: PageProps<"/notes">) {
 
   return (
     <>
-      <PageHead emoji="💌" title="Захидал" sub="Өдөр тутмын бяцхан зурвас, эсвэл тодорхой мөчид нээх захидал." />
+      <PageHead icon="mail" title="Захидал" sub="Өдөр тутмын бяцхан зурвас, эсвэл тодорхой мөчид нээх захидал." />
       <Tabs
         items={[
           ["wall", "📝 Зурвасын хана"],
@@ -73,8 +73,8 @@ async function Wall({ db, me, names, tz }: { db: Db; me: Who; names: Record<Who,
                   </span>
                   <form action={toggleLike.bind(null, n.id)}>
                     <SubmitButton className={`icon-btn heart${liked ? " on" : ""}`} aria-label="Таалагдлаа">
-                      {liked ? "❤️" : "🤍"}
-                      {likes > 0 && ` ${likes}`}
+                      <Icon name="heart" size={16} />
+                      {likes > 0 && <span className="small">{likes}</span>}
                     </SubmitButton>
                   </form>
                   {by === me && (

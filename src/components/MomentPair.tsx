@@ -118,7 +118,9 @@ export default function MomentPair({
           </div>
         ) : isToday ? (
           <div className="polaroid-wait">
-            <span className="cta-ico">⏳</span>
+            <span className="cta-ico">
+              <Icon name="clock" size={26} />
+            </span>
             <b>{names[partner]} хараахан хуваалцаагүй</b>
             <MissButton variant="pill" />
           </div>
@@ -133,7 +135,9 @@ export default function MomentPair({
 function EmptySlot({ text }: { text: string }) {
   return (
     <div className="polaroid-wait">
-      <span className="cta-ico">🌙</span>
+      <span className="cta-ico">
+        <Icon name="clock" size={26} />
+      </span>
       <span className="small">{text}</span>
     </div>
   );

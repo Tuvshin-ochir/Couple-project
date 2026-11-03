@@ -14,7 +14,7 @@ export async function GET() {
 
   const by = other(me);
   const latest = { orderBy: { createdAt: "desc" as const }, select: { createdAt: true } };
-  const [sync, nudge, note, letter, qotd, moment, vault] = await Promise.all([
+  const [sync, nudge, note, letter, qotd, moment, vault, song] = await Promise.all([
     db.syncTimer.findFirst({ orderBy: { createdAt: "desc" } }),
     db.nudge.findFirst({ where: { by }, ...latest }),
     db.note.findFirst({ where: { by }, ...latest }),
@@ -22,6 +22,7 @@ export async function GET() {
     db.qotdAnswer.findFirst({ where: { by }, ...latest }),
     db.moment.findFirst({ where: { by }, orderBy: { updatedAt: "desc" }, select: { updatedAt: true } }),
     db.vaultPhoto.findFirst({ where: { by }, ...latest }),
+    db.song.findFirst({ where: { by }, ...latest }),
   ]);
 
   return Response.json(
@@ -36,6 +37,7 @@ export async function GET() {
         qotd: qotd?.createdAt.getTime() ?? 0,
         moment: moment?.updatedAt.getTime() ?? 0,
         vault: vault?.createdAt.getTime() ?? 0,
+        song: song?.createdAt.getTime() ?? 0,
       },
     },
     { headers: { "Cache-Control": "no-store" } },

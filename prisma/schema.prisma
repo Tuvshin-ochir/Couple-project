@@ -20,6 +20,7 @@ model Couple {
   nextMeet     DateTime?
   cityA        String? // JSON: { name, tz, lat, lon }
   cityB        String?
+  bg           String? // арын градиент: "#rrggbb,#rrggbb" (null = энгийн цаас)
   passwordHash String
   vaultPinHash String? // "Нууц өрөө"-ний тусдаа PIN (null = тохируулаагүй)
   // Өгөгдөл өөрчлөгдөх бүрт нэмэгдэнэ — нөгөө талын браузер шинэчлэгдэх дохио
@@ -44,6 +45,39 @@ model Couple {
   qotd        QotdAnswer[]
   gameAnswers GameAnswer[]
   quiz        QuizQuestion[]
+  songs       Song[]
+  pushSubs    PushSubscription[]
+}
+
+// "Our taste" — хамтын playlist (YouTube)
+model Song {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  by        String
+  videoId   String
+  title     String
+  author    String   @default("")
+  note      String   @default("") // яагаад энэ дууг нэмсэн бэ
+  likedA    Boolean  @default(false)
+  likedB    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([coupleId, videoId])
+}
+
+// Утасны push мэдэгдэл — төхөөрөмж бүрийн бүртгэл (who = тэр төхөөрөмж дээр нэвтэрсэн хүн)
+model PushSubscription {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  who       String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([coupleId, who])
 }
 
 model Note {

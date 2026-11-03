@@ -30,7 +30,7 @@ export default async function DatesPage(props: PageProps<"/dates">) {
 
   return (
     <>
-      <PageHead emoji="🎬" title="Онлайн болзоо" sub="Зай хол ч хамтдаа өнгөрүүлэх олон арга бий." />
+      <PageHead icon="video" title="Онлайн болзоо" sub="Зай хол ч хамтдаа өнгөрүүлэх олон арга бий." />
 
       <div className="grid two">
         <section className="card">
@@ -69,7 +69,7 @@ export default async function DatesPage(props: PageProps<"/dates">) {
                   <form action={logDate}>
                     <input type="hidden" name="text" value={i.text} />
                     <input type="hidden" name="emoji" value={i.emoji} />
-                    <SubmitButton className="btn line sm" toastMsg="💞 Болзооны түүхэнд нэмэгдлээ" burst={6}>
+                    <SubmitButton className="btn line sm" toastMsg="Болзооны түүхэнд нэмэгдлээ">
                       {n ? `✓ ${n} удаа` : "Хийлээ"}
                     </SubmitButton>
                   </form>

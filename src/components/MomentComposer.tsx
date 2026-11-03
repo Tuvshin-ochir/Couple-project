@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { postMoment } from "@/app/actions";
 import { MOODS, PHOTO_FILTERS, filterCss } from "@/lib/content";
-import { compressImage, hearts, pulseNow, toast } from "@/lib/fx";
+import { compressImage, pulseNow, toast } from "@/lib/fx";
 import type { Who } from "@/lib/types";
 import Icon from "./Icon";
 import Modal from "./Modal";
@@ -94,7 +94,6 @@ export default function MomentComposer({ who, name, existing, className = "btn",
       blobs.current = null;
       setOpen(false);
       toast(existing ? "📸 Мөч шинэчлэгдлээ" : "📸 Өнөөдрийн мөч хуваалцагдлаа");
-      hearts(12);
       pulseNow();
     });
   }
@@ -187,7 +186,7 @@ export default function MomentComposer({ who, name, existing, className = "btn",
 
             {error && <p className="err">{error}</p>}
             <button type="button" className="btn wide" onClick={submit} disabled={pending || busy}>
-              {pending ? "Хуваалцаж байна…" : existing ? "Шинэчлэх 💞" : "Хуваалцах 💞"}
+              {pending ? "Хуваалцаж байна…" : existing ? "Шинэчлэх" : "Хуваалцах"}
             </button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { addVaultPhoto } from "@/app/actions";
-import { compressImage, hearts, pulseNow, toast } from "@/lib/fx";
+import { compressImage, pulseNow, toast } from "@/lib/fx";
 import Icon from "../Icon";
 import Modal from "../Modal";
 
@@ -57,7 +57,6 @@ export default function VaultUpload() {
       setOpen(false);
       reset();
       toast(viewOnce ? "🔥 Нэг удаа харах зураг илгээгдлээ" : "🔒 Нууц өрөөнд нэмэгдлээ");
-      hearts(10);
       pulseNow();
     });
   }

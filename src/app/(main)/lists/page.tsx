@@ -21,7 +21,7 @@ export default async function ListsPage(props: PageProps<"/lists">) {
 
   return (
     <>
-      <PageHead emoji="🍿" title="Хамтын жагсаалт" sub="Хамт үзэх кино, сонсох дуу, унших ном, очих газар…" />
+      <PageHead icon="list" title="Хамтын жагсаалт" sub="Хамт үзэх кино, сонсох дуу, унших ном, очих газар…" />
 
       <form action={addListItem} className="card">
         <div className="cols3">

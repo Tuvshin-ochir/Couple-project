@@ -111,7 +111,7 @@ async function Wishes({ ctx }: { ctx: Ctx }) {
   return (
     <>
       <section className="vault-card">
-        <h2>💞 Хоёулаа хүсдэг</h2>
+        <h2>Хоёулаа хүсдэг</h2>
         {matches.length ? (
           <ul className="wish-matches">
             {matches.map((m) => (

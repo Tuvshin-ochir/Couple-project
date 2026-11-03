@@ -28,7 +28,7 @@ export default async function MemoriesPage() {
 
   return (
     <>
-      <PageHead emoji="📸" title="Дурсамж" sub="Хамтдаа өнгөрүүлсэн мөчүүдийн цагийн хэлхээс." />
+      <PageHead icon="image" title="Дурсамж" sub="Хамтдаа өнгөрүүлсэн мөчүүдийн цагийн хэлхээс." />
       <MemoryForm today={dayKey(new Date(), tz)} />
 
       {memories.length === 0 ? (

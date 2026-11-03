@@ -22,7 +22,7 @@ export default async function DaysPage() {
 
   return (
     <>
-      <PageHead emoji="📅" title="Чухал өдрүүд" sub="Төрсөн өдөр, ой, аялал — юуг ч мартахгүй." />
+      <PageHead icon="calendar" title="Чухал өдрүүд" sub="Төрсөн өдөр, ой, аялал — юуг ч мартахгүй." />
 
       <form action={addDay} className="card">
         <div className="cols3">

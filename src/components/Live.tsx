@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { hearts, toast, useNow } from "@/lib/fx";
+import { sendNudge } from "@/app/actions";
+import { toast, useNow } from "@/lib/fx";
 import { other, type Names, type Who } from "@/lib/types";
+import MissOverlay from "./MissOverlay";
 
 type Pulse = {
   v: number;
   now: number;
   sync: { at: number; by: Who } | null;
-  latest: Record<"nudge" | "note" | "letter" | "qotd" | "moment" | "vault", number>;
+  latest: Record<"nudge" | "note" | "letter" | "qotd" | "moment" | "vault" | "song", number>;
 };
 
 const POLL_MS = 3000;
@@ -24,17 +26,20 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
   const busy = useRef(false);
   // skew = серверийн цаг − энэ төхөөрөмжийн цаг (хоёр тал яг зэрэг тоолохын тулд)
   const [sync, setSync] = useState<(NonNullable<Pulse["sync"]> & { skew: number }) | null>(null);
+  // Хайртаасаа "санаж байна" ирсэн үед (апп нээлттэй эсвэл мэдэгдэл дээр дарж орсон)
+  const [missed, setMissed] = useState(false);
 
   const notify = useCallback(
     (latest: Pulse["latest"]) => {
       const pn = names[other(me)];
       const messages: Record<keyof Pulse["latest"], string> = {
-        nudge: `💗 ${pn} чамайг санаж байна!`,
+        nudge: "",
         note: `💌 ${pn} шинэ зурвас үлдээлээ`,
         letter: `✉️ ${pn} чамд захидал бичлээ`,
         qotd: `❓ ${pn} өнөөдрийн асуултад хариуллаа`,
         moment: `📸 ${pn} өдрийн мөчөө хуваалцлаа`,
-        vault: `🔒 ${pn} Нууц өрөөнд шинэ зүйл үлдээлээ 😏`,
+        vault: `🔒 ${pn} Нууц өрөөнд шинэ зүйл үлдээлээ`,
+        song: `🎵 ${pn} шинэ дуу нэмлээ`,
       };
       const key = `bh_seen_${me}`;
       let seen: Record<string, number> = {};
@@ -48,8 +53,8 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
           seen[k] = t; // анх удаа — хуучныг мэдэгдэхгүй
           changed = true;
         } else if (t > seen[k]) {
-          toast(messages[k]);
-          if (k === "nudge") hearts(16);
+          if (k === "nudge") setMissed(true);
+          else toast(messages[k]);
           seen[k] = t;
           changed = true;
         }
@@ -93,7 +98,26 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
       }
     } catch {}
 
-    const first = setTimeout(poll, 0);
+    // Утасны мэдэгдэл дээр дарж орсон бол (?miss=…) анимацитай цонх нээнэ
+    const first = setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("miss")) {
+        setMissed(true);
+        url.searchParams.delete("miss");
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      }
+      // Апп-ын дүрс дээр удаан дараад "Санаж байна" товчлолоор орсон бол (?send=miss) шууд илгээнэ.
+      // Параметрийг эхлээд арилгаж, refresh хийхэд дахин илгээгдэхгүй
+      if (url.searchParams.get("send") === "miss") {
+        url.searchParams.delete("send");
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+        sendNudge().then(
+          () => toast("Санаж байгаагаа илгээлээ"),
+          () => toast("Илгээж чадсангүй — дахин оролдоорой", "error"),
+        );
+      }
+      poll();
+    }, 0);
     const id = setInterval(poll, POLL_MS);
     const onVisible = () => document.visibilityState === "visible" && poll();
     document.addEventListener("visibilitychange", onVisible);
@@ -106,7 +130,12 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
     };
   }, [poll, router]);
 
-  return sync ? <SyncOverlay sync={sync} names={names} /> : null;
+  return (
+    <>
+      {sync && <SyncOverlay sync={sync} names={names} />}
+      {missed && <MissOverlay who={other(me)} name={names[other(me)]} onClose={() => setMissed(false)} />}
+    </>
+  );
 }
 
 function SyncOverlay({ sync, names }: { sync: NonNullable<Pulse["sync"]> & { skew: number }; names: Names }) {

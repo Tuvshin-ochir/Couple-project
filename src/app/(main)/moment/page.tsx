@@ -57,7 +57,7 @@ export default async function MomentPage(props: PageProps<"/moment">) {
 
   return (
     <>
-      <PageHead emoji="📸" title="Өдрийн мөч" sub="Өдөр бүр нэг зураг, нэг сэтгэл. Хоёулаа хуваалцсаны дараа бие биенийхээ мөчийг харна." />
+      <PageHead icon="camera" title="Өдрийн мөч" sub="Өдөр бүр нэг зураг, нэг сэтгэл. Хоёулаа хуваалцсаны дараа бие биенийхээ мөчийг харна." />
 
       <section className="moment-stage">
         <div className="stage-head">

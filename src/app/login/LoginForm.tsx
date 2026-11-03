@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { login } from "@/app/actions";
 import Avatar from "@/components/Avatar";
+import { Heart, Wordmark } from "@/components/Brand";
 
 /**
  * 1-р алхам: хосын нэр + нууц үг. Зөв бол 2-р алхамд "чи хэн бэ" товчнууд гарна.
@@ -17,13 +18,13 @@ export default function LoginForm({ initialHandle }: { initialHandle: string }) 
 
   return (
     <form action={action} className="auth-card stack">
-      <div className="auth-hero" aria-hidden="true">
-        {names ? "💞" : "🔒"}
+      <div className="auth-hero">
+        <Wordmark size={15} />
       </div>
       {names ? (
         <>
           <h1 className="center">
-            {names.a} <em>&</em> {names.b}
+            {names.a} <Heart size={22} shine className="heart-beat" /> {names.b}
           </h1>
           <p className="center muted">Тавтай морил! Чи хэн бэ?</p>
           <input type="hidden" name="handle" value={handle} />

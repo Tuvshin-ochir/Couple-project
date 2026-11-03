@@ -2,7 +2,6 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { resetVaultPin, setupVault, unlockVault } from "@/app/actions";
-import { hearts } from "@/lib/fx";
 import Icon from "../Icon";
 
 /** Анх удаа: PIN тохируулах + 18+ баталгаажуулалт */
@@ -48,7 +47,7 @@ export function VaultLock() {
         setError(r.error);
         setPin("");
         setShake((n) => n + 1);
-      } else hearts(10);
+      }
     });
 
   const press = (k: string) => {

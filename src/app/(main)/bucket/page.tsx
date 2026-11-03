@@ -32,7 +32,7 @@ export default async function BucketPage(props: PageProps<"/bucket">) {
 
   return (
     <>
-      <PageHead emoji="✨" title="Хамтдаа хийх зүйлс" sub="Мөрөөдлийн жагсаалт — нэг нэгээр нь биелүүлье." />
+      <PageHead icon="sparkles" title="Хамтдаа хийх зүйлс" sub="Мөрөөдлийн жагсаалт — нэг нэгээр нь биелүүлье." />
 
       <form action={addBucket} className="card compose row">
         <input name="text" maxLength={140} placeholder="Жишээ нь: Хамтдаа Хөвсгөл нуурт очих" required />
@@ -61,7 +61,6 @@ export default async function BucketPage(props: PageProps<"/bucket">) {
                 <SubmitButton
                   className="cbox"
                   aria-label={x.doneAt ? "Биелээгүй болгох" : "Биелсэн гэж тэмдэглэх"}
-                  burst={x.doneAt ? 0 : 10}
                   toastMsg={x.doneAt ? undefined : "🎉 Нэг мөрөөдөл биеллээ!"}
                 >
                   {x.doneAt ? "✓" : ""}

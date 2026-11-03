@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { deleteLetter, openLetter } from "@/app/actions";
-import { hearts, toast } from "@/lib/fx";
+import { toast } from "@/lib/fx";
 import type { Who } from "@/lib/types";
 import Avatar from "./Avatar";
 import Modal from "./Modal";
@@ -34,7 +34,6 @@ export default function LetterCard({ id, title, by, fromName, dateText, own, sta
       if (!r) return toast("Захидал олдсонгүй", "error");
       setText(r.body);
       setOpen(true);
-      hearts(10);
     });
   };
 

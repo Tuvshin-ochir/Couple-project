@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { logout } from "@/app/actions";
 import type { Names, Who } from "@/lib/types";
 import Avatar from "./Avatar";
+import { Heart, Wordmark } from "./Brand";
 import Icon, { type IconName } from "./Icon";
+import LogoutButton from "./LogoutButton";
 import MissButton from "./MissButton";
 
 type Item = readonly [href: string, icon: IconName, label: string];
@@ -22,6 +23,7 @@ const GROUPS: { label?: string; items: Item[] }[] = [
     label: "Хамтдаа",
     items: [
       ["/notes", "mail", "Захидал"],
+      ["/music", "music", "Our taste"],
       ["/dates", "video", "Болзоо"],
       ["/games", "dice", "Тоглоом"],
     ],
@@ -50,6 +52,7 @@ const TABS: Item[] = [
 ];
 
 const MORE: Item[] = [
+  ["/music", "music", "Our taste"],
   ["/memories", "image", "Дурсамж"],
   ["/dates", "video", "Болзоо"],
   ["/bucket", "sparkles", "Мөрөөдөл"],
@@ -81,16 +84,22 @@ export default function Sidebar({ names, me, unread }: { names: Names; me: Who; 
       <Avatar who="b" name={names.b} size="sm" />
     </span>
   );
+  const coupleName = (
+    <span className="brand-name">
+      {names.a} <Heart size={13} className="heart-beat" /> {names.b}
+    </span>
+  );
 
   return (
     <>
       {/* ── Компьютер: хажуугийн цэс ── */}
       <aside className="sidebar">
+        <div className="side-logo">
+          <Wordmark size={13} />
+        </div>
         <Link href="/" className="brand">
           {couple}
-          <span className="brand-name">
-            {names.a} <em>&</em> {names.b}
-          </span>
+          {coupleName}
         </Link>
         <nav className="nav" aria-label="Үндсэн цэс">
           {GROUPS.map((g, i) => (
@@ -114,11 +123,9 @@ export default function Sidebar({ names, me, unread }: { names: Names; me: Who; 
             <Link href="/settings" className={`icon-btn${isActive(path, "/settings") ? " on" : ""}`} aria-label="Тохиргоо" title="Тохиргоо">
               <Icon name="settings" size={18} />
             </Link>
-            <form action={logout}>
-              <button className="icon-btn" aria-label="Гарах" title="Гарах">
-                <Icon name="logout" size={18} />
-              </button>
-            </form>
+            <LogoutButton className="icon-btn" label="Гарах">
+              <Icon name="logout" size={18} />
+            </LogoutButton>
           </div>
         </div>
       </aside>
@@ -127,9 +134,7 @@ export default function Sidebar({ names, me, unread }: { names: Names; me: Who; 
       <header className="topbar">
         <Link href="/" className="brand" onClick={close}>
           {couple}
-          <span className="brand-name">
-            {names.a} <em>&</em> {names.b}
-          </span>
+          {coupleName}
         </Link>
         <MissButton variant="icon" />
       </header>
@@ -178,11 +183,9 @@ export default function Sidebar({ names, me, unread }: { names: Names; me: Who; 
         <div className="me-row">
           <Avatar who={me} name={names[me]} size="sm" />
           <span className="grow">{names[me]}</span>
-          <form action={logout}>
-            <button className="btn line sm" tabIndex={sheet ? 0 : -1}>
-              <Icon name="logout" size={16} /> Гарах
-            </button>
-          </form>
+          <LogoutButton className="btn line sm">
+            <Icon name="logout" size={16} /> Гарах
+          </LogoutButton>
         </div>
       </div>
     </>

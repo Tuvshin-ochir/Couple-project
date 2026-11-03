@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Icon, { type IconName } from "./Icon";
 
-export function PageHead({ emoji, title, sub }: { emoji: string; title: string; sub?: string }) {
+export function PageHead({ icon, title, sub }: { icon: IconName; title: string; sub?: string }) {
   return (
     <header className="page-head">
       <span className="page-ico" aria-hidden="true">
-        {emoji}
+        <Icon name={icon} size={24} />
       </span>
       <div>
         <h1>{title}</h1>
