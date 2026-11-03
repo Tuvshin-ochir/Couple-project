@@ -5,16 +5,15 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead } from "@/components/ui";
 import { DAY_TYPES } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { upcomingEvents, type Ev } from "@/lib/events";
 import { dayKey, daysBetween, fmtKey, utcKey, weekdayOfKey } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Чухал өдрүүд" };
 
 export default async function DaysPage() {
-  const { s, tz } = await getCtx();
+  const { s, tz, db } = await getCtx();
   const today = dayKey(new Date(), tz);
-  const days = await prisma.specialDay.findMany();
+  const days = await db.specialDay.findMany();
   const upcoming = upcomingEvents(s, days, today, tz);
   const past: Ev[] = days
     .filter((d) => !d.yearly && utcKey(d.date) < today)

@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { readSession } from "@/lib/auth";
-import { getSettings } from "@/lib/ctx";
 import LoginForm from "./LoginForm";
 
 export const metadata: Metadata = { title: "Нэвтрэх" };
 
-export default async function LoginPage() {
+// Урилгын холбоос: /login?c=<хосын нэр> — хосын нэр нь урьдчилж бөглөгдөнө
+export default async function LoginPage(props: PageProps<"/login">) {
   await connection();
-  const s = await getSettings();
-  if (!s) redirect("/setup");
-  if (await readSession(s.passwordHash)) redirect("/");
+  if (await readSession()) redirect("/");
+  const c = (await props.searchParams).c;
+  const handle = typeof c === "string" ? c.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 30) : "";
   return (
     <main className="auth">
-      <LoginForm names={{ a: s.nameA, b: s.nameB }} />
+      <LoginForm initialHandle={handle} />
     </main>
   );
 }

@@ -5,11 +5,12 @@ import { prisma } from "@/lib/db";
 // Дурсамжийн зургийг зөвхөн нэвтэрсэн хост харна
 export async function GET(_req: Request, ctx: RouteContext<"/photos/[id]">) {
   await connection();
-  const s = await prisma.settings.findUnique({ where: { id: 1 } });
-  if (!s || !(await readSession(s.passwordHash))) return new Response("Unauthorized", { status: 401 });
+  const session = await readSession();
+  if (!session) return new Response("Unauthorized", { status: 401 });
 
   const { id } = await ctx.params;
-  const photo = await prisma.photo.findUnique({ where: { id } });
+  // Зураг нь зөвхөн энэ хосын дурсамжид хамаарах ёстой
+  const photo = await prisma.photo.findFirst({ where: { id, memory: { coupleId: session.couple.id } } });
   if (!photo) return new Response("Not found", { status: 404 });
 
   return new Response(photo.data, {

@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import Live from "@/components/Live";
 import Sidebar from "@/components/Sidebar";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,8 +19,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
 // Нэвтрэлт шалгаж, цэс болон бодит цагийн синкийг байрлуулна
 async function Shell({ children }: { children: React.ReactNode }) {
-  const { me, partner, names, avatars } = await getCtx();
-  const unread = await prisma.letter.count({ where: { by: partner, openedAt: null } });
+  const { me, partner, names, avatars, db } = await getCtx();
+  const unread = await db.letter.count({ where: { by: partner, openedAt: null } });
   // Профайл зураг байвал бүх .av-a / .av-b аватар дээр автоматаар харагдана
   const avatarCss = (["a", "b"] as const)
     .filter((w) => avatars[w])

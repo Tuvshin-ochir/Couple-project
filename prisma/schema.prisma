@@ -1,4 +1,5 @@
-// "Бид хоёр" — алсын зайн хосын сайтын өгөгдлийн сан.
+// "Бид хоёр" — олон хос бүртгүүлдэг хувилбар.
+// Хос бүрийн өгөгдөл `coupleId`-аар тусгаарлагдана (src/lib/db.ts → scoped()).
 // Бүх мөрийн `by` талбар нь "a" эсвэл "b" — хосын аль нь үүсгэснийг заана.
 
 generator client {
@@ -10,9 +11,9 @@ datasource db {
   provider = "sqlite"
 }
 
-// Хосын тохиргоо — ганцхан мөр (id = 1)
-model Settings {
-  id           Int       @id @default(1)
+model Couple {
+  id           String    @id @default(cuid())
+  handle       String    @unique // хосын нэр — нэвтрэх, урилгын холбоосонд (жишээ: bat-saraa)
   nameA        String
   nameB        String
   startDate    DateTime? // зөвхөн огноо (UTC шөнө дунд)
@@ -23,31 +24,60 @@ model Settings {
   vaultPinHash String? // "Нууц өрөө"-ний тусдаа PIN (null = тохируулаагүй)
   // Өгөгдөл өөрчлөгдөх бүрт нэмэгдэнэ — нөгөө талын браузер шинэчлэгдэх дохио
   version      Int       @default(0)
+  createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+
+  notes       Note[]
+  letters     Letter[]
+  memories    Memory[]
+  bucket      BucketItem[]
+  moments     Moment[]
+  vaultPhotos VaultPhoto[]
+  vaultWishes VaultWish[]
+  avatars     AvatarImage[]
+  days        SpecialDay[]
+  lists       ListItem[]
+  nudges      Nudge[]
+  dateIdeas   DateIdea[]
+  dateLogs    DateLog[]
+  syncTimers  SyncTimer[]
+  qotd        QotdAnswer[]
+  gameAnswers GameAnswer[]
+  quiz        QuizQuestion[]
 }
 
 model Note {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   text      String
   color     String   @default("pink")
   likedA    Boolean  @default(false)
   likedB    Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
 // "Нээх захидал" — хүлээн авагч нээх хүртэл битүүмжлэгдэнэ
 model Letter {
   id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   title     String
   body      String
   openedAt  DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([coupleId])
 }
 
 model Memory {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   title     String
   date      DateTime // зөвхөн огноо
@@ -55,8 +85,11 @@ model Memory {
   story     String   @default("")
   photos    Photo[]
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
+// Дурсамжийн зураг — хос нь Memory-оор дамжин тодорхойлогдоно
 model Photo {
   id       String @id @default(cuid())
   memoryId String
@@ -69,15 +102,21 @@ model Photo {
 
 model BucketItem {
   id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   text      String
   doneAt    DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([coupleId])
 }
 
 // "Өдрийн мөч" — хүн бүр өдөрт нэг зураг + сэтгэл + тайлбар
 model Moment {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   day       String // YYYY-MM-DD, оруулсан хүний цагаар
   mood      String
@@ -90,14 +129,16 @@ model Moment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([by, day])
-  @@index([day])
+  @@unique([coupleId, by, day])
+  @@index([coupleId, day])
 }
 
 // ── Нууц өрөө (18+) — зөвхөн тусдаа PIN-ээр нээгдэнэ, нөөц файлд орохгүй ──
 
 model VaultPhoto {
   id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   caption   String    @default("")
   mime      String
@@ -106,105 +147,142 @@ model VaultPhoto {
   viewOnce  Boolean   @default(false) // хайрт нь нэг үзмэгц устна
   viewedAt  DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([coupleId])
 }
 
 // "Хүслийн тохирол" — item = WISHES-ийн дугаар, answer: 2 тийм, 1 магадгүй, 0 үгүй
 model VaultWish {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   item      Int
   answer    Int
   createdAt DateTime @default(now())
 
-  @@unique([item, by])
+  @@unique([coupleId, item, by])
 }
 
 // Профайл зураг (who = "a" | "b")
 model AvatarImage {
-  who       String   @id
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  who       String
   mime      String
   data      Bytes
   updatedAt DateTime @updatedAt
+
+  @@unique([coupleId, who])
 }
 
 model SpecialDay {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   title     String
   date      DateTime // зөвхөн огноо
   emoji     String   @default("📌")
   yearly    Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
 model ListItem {
   id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   type      String
   title     String
   url       String    @default("")
   doneAt    DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([coupleId])
 }
 
 model Nudge {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   createdAt DateTime @default(now())
 
-  @@index([createdAt])
+  @@index([coupleId, createdAt])
 }
 
 model DateIdea {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   emoji     String   @default("💡")
   text      String
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
 model DateLog {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   text      String
   emoji     String   @default("💞")
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
 // Кино, дуугаа зэрэг асаах тоолуур
 model SyncTimer {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   at        DateTime
   createdAt DateTime @default(now())
+
+  @@index([coupleId])
 }
 
 model QotdAnswer {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   day       String
   question  String   @default("") // асуултын сан өөрчлөгдсөн ч түүх зөв харагдана
   text      String
   createdAt DateTime @default(now())
 
-  @@unique([day, by])
+  @@unique([coupleId, day, by])
 }
 
 // "Аль нь дээр вэ?" ба "Хэн нь илүү?" тоглоомын хариулт (q = асуултын дугаар)
 model GameAnswer {
   id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   game      String
   q         Int
   choice    Int
   createdAt DateTime @default(now())
 
-  @@unique([game, q, by])
+  @@unique([coupleId, game, q, by])
 }
 
 // "Намайг хэр мэдэх вэ?" — өөрийнхөө тухай асуулт, хайрт нь таана
 model QuizQuestion {
   id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   by        String
   question  String
   answer    String
@@ -212,4 +290,6 @@ model QuizQuestion {
   correct   Boolean?
   guessedAt DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([coupleId])
 }

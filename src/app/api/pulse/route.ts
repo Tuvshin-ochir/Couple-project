@@ -1,26 +1,27 @@
 import { connection } from "next/server";
 import { readSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { scoped } from "@/lib/db";
 import { other } from "@/lib/types";
 
 // Клиент хэдэн секунд тутам шалгадаг жижиг хариу: өгөгдлийн хувилбар,
 // зэрэг эхлүүлэх тоолуур, хайртын сүүлийн үйлдлүүдийн цаг.
 export async function GET() {
   await connection();
-  const s = await prisma.settings.findUnique({ where: { id: 1 } });
-  const me = s && (await readSession(s.passwordHash));
-  if (!s || !me) return Response.json({ error: "unauthorized" }, { status: 401 });
+  const session = await readSession();
+  if (!session) return Response.json({ error: "unauthorized" }, { status: 401 });
+  const { couple: s, me } = session;
+  const db = scoped(s.id);
 
   const by = other(me);
   const latest = { orderBy: { createdAt: "desc" as const }, select: { createdAt: true } };
   const [sync, nudge, note, letter, qotd, moment, vault] = await Promise.all([
-    prisma.syncTimer.findFirst({ orderBy: { createdAt: "desc" } }),
-    prisma.nudge.findFirst({ where: { by }, ...latest }),
-    prisma.note.findFirst({ where: { by }, ...latest }),
-    prisma.letter.findFirst({ where: { by }, ...latest }),
-    prisma.qotdAnswer.findFirst({ where: { by }, ...latest }),
-    prisma.moment.findFirst({ where: { by }, orderBy: { updatedAt: "desc" }, select: { updatedAt: true } }),
-    prisma.vaultPhoto.findFirst({ where: { by }, ...latest }),
+    db.syncTimer.findFirst({ orderBy: { createdAt: "desc" } }),
+    db.nudge.findFirst({ where: { by }, ...latest }),
+    db.note.findFirst({ where: { by }, ...latest }),
+    db.letter.findFirst({ where: { by }, ...latest }),
+    db.qotdAnswer.findFirst({ where: { by }, ...latest }),
+    db.moment.findFirst({ where: { by }, orderBy: { updatedAt: "desc" }, select: { updatedAt: true } }),
+    db.vaultPhoto.findFirst({ where: { by }, ...latest }),
   ]);
 
   return Response.json(

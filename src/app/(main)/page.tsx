@@ -4,12 +4,12 @@ import Clocks from "@/components/Clocks";
 import Countdown from "@/components/Countdown";
 import Icon from "@/components/Icon";
 import IdeaRoller from "@/components/IdeaRoller";
+import InviteLink from "@/components/InviteLink";
 import MissButton from "@/components/MissButton";
 import MomentPair from "@/components/MomentPair";
 import QotdCard from "@/components/QotdCard";
 import { DATE_IDEAS, hashStr, qotdDay } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { leftText, upcomingEvents } from "@/lib/events";
 import { dayKey, daysBetween, fmtKey, fmtKeyShort, fmtTime, rel, startOfDay, tzParts, utcKey, weekdayOfKey, ymd, ymdText } from "@/lib/time";
 import type { Who } from "@/lib/types";
@@ -21,30 +21,31 @@ function greeting(h: number) {
   return "Сайхан амраарай";
 }
 
-export default async function HomePage() {
+export default async function HomePage(props: PageProps<"/">) {
   const ctx = await getCtx();
-  const { s, me, partner, names, tz, cityA, cityB } = ctx;
+  const justJoined = (await props.searchParams).welcome === "1";
+  const { s, me, partner, names, tz, cityA, cityB, db } = ctx;
   const now = new Date();
   const today = dayKey(now, tz);
   const qday = qotdDay(now);
   const since = startOfDay(today, tz);
 
   const [nudgeA, nudgeB, lastNudge, moments, lastNote, qotd, specialDays, customIdeas, stats] = await Promise.all([
-    prisma.nudge.count({ where: { by: "a", createdAt: { gte: since } } }),
-    prisma.nudge.count({ where: { by: "b", createdAt: { gte: since } } }),
-    prisma.nudge.findFirst({ where: { by: partner }, orderBy: { createdAt: "desc" } }),
-    prisma.moment.findMany({ where: { day: today }, omit: { photo: true, thumb: true } }),
-    prisma.note.findFirst({ orderBy: { createdAt: "desc" } }),
-    prisma.qotdAnswer.findMany({ where: { day: qday } }),
-    prisma.specialDay.findMany(),
-    prisma.dateIdea.findMany({ orderBy: { createdAt: "desc" } }),
+    db.nudge.count({ where: { by: "a", createdAt: { gte: since } } }),
+    db.nudge.count({ where: { by: "b", createdAt: { gte: since } } }),
+    db.nudge.findFirst({ where: { by: partner }, orderBy: { createdAt: "desc" } }),
+    db.moment.findMany({ where: { day: today }, omit: { photo: true, thumb: true } }),
+    db.note.findFirst({ orderBy: { createdAt: "desc" } }),
+    db.qotdAnswer.findMany({ where: { day: qday } }),
+    db.specialDay.findMany(),
+    db.dateIdea.findMany({ orderBy: { createdAt: "desc" } }),
     Promise.all([
-      prisma.memory.count(),
-      prisma.note.count(),
-      prisma.letter.count(),
-      prisma.moment.count(),
-      prisma.bucketItem.count(),
-      prisma.bucketItem.count({ where: { doneAt: { not: null } } }),
+      db.memory.count(),
+      db.note.count(),
+      db.letter.count(),
+      db.moment.count(),
+      db.bucketItem.count(),
+      db.bucketItem.count({ where: { doneAt: { not: null } } }),
     ]),
   ]);
 
@@ -57,6 +58,13 @@ export default async function HomePage() {
 
   return (
     <div className="bento">
+      {justJoined && (
+        <section className="card c12 invite-card">
+          <h2>🎉 Тавтай морил! Одоо хайртдаа урилга илгээгээрэй</h2>
+          <p className="small muted">Энэ холбоосоор орж ирээд өөрийгөө сонгож, хосын нууц үгээр нэвтэрнэ. Дараа нь Тохиргоо хэсгээс ч олж болно.</p>
+          <InviteLink handle={ctx.s.handle} />
+        </section>
+      )}
       {/* ── Толгой ── */}
       <section className="hero c12">
         <div className="hero-text">

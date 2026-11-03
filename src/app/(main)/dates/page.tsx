@@ -7,19 +7,18 @@ import SubmitButton from "@/components/SubmitButton";
 import { Empty, PageHead, Tabs } from "@/components/ui";
 import { DATE_IDEAS, IDEA_TAGS, SYNC_SECONDS, hashStr } from "@/lib/content";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { dayKey, fmtDate } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Болзоо" };
 
 export default async function DatesPage(props: PageProps<"/dates">) {
-  const { names, tz } = await getCtx();
+  const { names, tz, db } = await getCtx();
   const sp = await props.searchParams;
   const tag = IDEA_TAGS.some(([k]) => k === sp.tag) ? (sp.tag as string) : "all";
   const [custom, log] = await Promise.all([
-    prisma.dateIdea.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.dateLog.findMany({ orderBy: { createdAt: "desc" } }),
+    db.dateIdea.findMany({ orderBy: { createdAt: "desc" } }),
+    db.dateLog.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   const ideas = [

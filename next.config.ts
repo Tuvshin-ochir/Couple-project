@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Хуучин "Сэтгэл" хуудас "Өдрийн мөч" болсон
   async redirects() {
-    return [{ source: "/mood", destination: "/moment", permanent: false }];
+    return [
+      { source: "/mood", destination: "/moment", permanent: false },
+      { source: "/setup", destination: "/signup", permanent: false },
+    ];
   },
   experimental: {
     serverActions: {

@@ -10,7 +10,6 @@ import VaultTile from "@/components/vault/VaultTile";
 import VaultUpload from "@/components/vault/VaultUpload";
 import { WISHES, WISH_ANSWERS } from "@/lib/content";
 import { getCtx, type Ctx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { rel } from "@/lib/time";
 import type { Who } from "@/lib/types";
 import { vaultUntil } from "@/lib/vault";
@@ -25,7 +24,7 @@ const TABS = [
 
 export default async function VaultPage(props: PageProps<"/vault">) {
   const ctx = await getCtx();
-  const { s, me } = ctx;
+  const { s, me, cid } = ctx;
 
   if (!s.vaultPinHash)
     return (
@@ -34,7 +33,7 @@ export default async function VaultPage(props: PageProps<"/vault">) {
       </div>
     );
 
-  const until = await vaultUntil(me, s.vaultPinHash);
+  const until = await vaultUntil(cid, me, s.vaultPinHash);
   if (!until)
     return (
       <div className="vault">
@@ -69,8 +68,8 @@ export default async function VaultPage(props: PageProps<"/vault">) {
 }
 
 async function Photos({ ctx }: { ctx: Ctx }) {
-  const { me, names, tz } = ctx;
-  const photos = await prisma.vaultPhoto.findMany({
+  const { me, names, tz, db } = ctx;
+  const photos = await db.vaultPhoto.findMany({
     orderBy: { createdAt: "desc" },
     select: { id: true, by: true, caption: true, viewOnce: true, viewedAt: true, createdAt: true },
   });
@@ -100,8 +99,8 @@ async function Photos({ ctx }: { ctx: Ctx }) {
 
 /** Зөвхөн хоёулаа "тийм/магадгүй" гэсэн санаа л ил гарна */
 async function Wishes({ ctx }: { ctx: Ctx }) {
-  const { me, partner, names } = ctx;
-  const answers = await prisma.vaultWish.findMany();
+  const { me, partner, names, db } = ctx;
+  const answers = await db.vaultWish.findMany();
   const mine = new Map(answers.filter((a) => a.by === me).map((a) => [a.item, a.answer]));
   const theirs = new Map(answers.filter((a) => a.by === partner).map((a) => [a.item, a.answer]));
   const matches = WISHES.map((w, i) => ({ w, i, a: mine.get(i), b: theirs.get(i) })).filter(

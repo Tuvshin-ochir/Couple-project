@@ -7,15 +7,14 @@ import SubmitButton from "@/components/SubmitButton";
 import ZoomImage from "@/components/ZoomImage";
 import { Empty, PageHead } from "@/components/ui";
 import { getCtx } from "@/lib/ctx";
-import { prisma } from "@/lib/db";
 import { dayKey, fmtKey, utcKey } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Дурсамж" };
 
 export default async function MemoriesPage() {
-  const { names, tz } = await getCtx();
-  const memories = await prisma.memory.findMany({
+  const { names, tz, db } = await getCtx();
+  const memories = await db.memory.findMany({
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     include: { photos: { select: { id: true } } },
   });

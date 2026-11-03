@@ -1,27 +1,30 @@
 import { connection } from "next/server";
 import { readSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { scoped } from "@/lib/db";
 
 // Бүх өгөгдлийг (зургийг base64 хэлбэрээр) нэг JSON файл болгон татуулна
 export async function GET() {
   await connection();
-  const s = await prisma.settings.findUnique({ where: { id: 1 } });
-  if (!s || !(await readSession(s.passwordHash))) return new Response("Unauthorized", { status: 401 });
+  const session = await readSession();
+  if (!session) return new Response("Unauthorized", { status: 401 });
+  const s = session.couple;
+  const db = scoped(s.id);
 
-  const settings = { ...s, passwordHash: undefined }; // нууц үгийн хэшийг нөөцөд оруулахгүй
+  // нууц үг, PIN-ий хэшийг нөөцөд оруулахгүй
+  const settings = { ...s, passwordHash: undefined, vaultPinHash: undefined };
   const [notes, letters, memories, bucket, moments, days, lists, ideas, dateLog, qotd, games, quiz] = await Promise.all([
-    prisma.note.findMany(),
-    prisma.letter.findMany(),
-    prisma.memory.findMany({ include: { photos: true } }),
-    prisma.bucketItem.findMany(),
-    prisma.moment.findMany({ omit: { thumb: true } }),
-    prisma.specialDay.findMany(),
-    prisma.listItem.findMany(),
-    prisma.dateIdea.findMany(),
-    prisma.dateLog.findMany(),
-    prisma.qotdAnswer.findMany(),
-    prisma.gameAnswer.findMany(),
-    prisma.quizQuestion.findMany(),
+    db.note.findMany(),
+    db.letter.findMany(),
+    db.memory.findMany({ include: { photos: true } }),
+    db.bucketItem.findMany(),
+    db.moment.findMany({ omit: { thumb: true } }),
+    db.specialDay.findMany(),
+    db.listItem.findMany(),
+    db.dateIdea.findMany(),
+    db.dateLog.findMany(),
+    db.qotdAnswer.findMany(),
+    db.gameAnswer.findMany(),
+    db.quizQuestion.findMany(),
   ]);
 
   const data = {
