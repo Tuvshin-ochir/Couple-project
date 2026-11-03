@@ -1,6 +1,7 @@
 import "server-only";
 import webpush from "web-push";
 import { prisma } from "./db";
+import { SITE_URL } from "./site";
 import type { Who } from "./types";
 
 // Утасны push мэдэгдэл (Web Push + VAPID). Түлхүүргүй орчинд (VAPID_*) чимээгүй алгасна.
@@ -12,7 +13,7 @@ function ready() {
   const priv = process.env.VAPID_PRIVATE_KEY;
   if (!pub || !priv) return false;
   if (!configured) {
-    webpush.setVapidDetails(process.env.VAPID_SUBJECT || "https://bid-hoyor-production.up.railway.app", pub, priv);
+    webpush.setVapidDetails(process.env.VAPID_SUBJECT || SITE_URL, pub, priv);
     configured = true;
   }
   return true;

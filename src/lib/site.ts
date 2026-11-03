@@ -4,8 +4,10 @@
 export const SITE_NAME = "Our cave";
 export const SITE_DESC = "Алсын зайн хосуудын хамтын орон зай — зурвас, дурсамж, болзоо, тоглоом.";
 
-// og:image гэх мэт бүрэн URL шаарддаг талбаруудад. Өөр домэйн холбовол SITE_URL-ээр солино.
-export const SITE_URL = process.env.SITE_URL ?? "https://bid-hoyor-production.up.railway.app";
+// og:image гэх мэт бүрэн URL шаарддаг талбаруудад. Railway домэйнаа (build, runtime хоёуланд) өгдөг
+// тул түүнийг дагана — домэйн солигдоход кодоо засах шаардлагагүй. Өөрийн домэйн холбовол SITE_URL.
+const railway = process.env.RAILWAY_PUBLIC_DOMAIN;
+export const SITE_URL = process.env.SITE_URL ?? (railway ? `https://${railway}` : "https://ourcave.up.railway.app");
 
 /** Хуудас бүр openGraph-аа бүтнээр нь дарж бичдэг тул нийтлэг талбаруудыг (зураг ч мөн) энд нэмнэ */
 export const og = (title: string, description: string) => ({
