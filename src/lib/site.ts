@@ -14,7 +14,8 @@ export const og = (title: string, description: string) => ({
   type: "website" as const,
   siteName: SITE_NAME,
   locale: "mn_MN",
-  title,
+  // Messenger г.м-ийн картын гарчгийн ард зүрх
+  title: `${title} ❤️`,
   description,
   // public/og.png — 1200×630, OUR♥CAVE
   images: [{ url: "/og.png", width: 1200, height: 630, alt: `${SITE_NAME} — алсын зайн хосуудын хамтын орон зай` }],
