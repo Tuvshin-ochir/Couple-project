@@ -23,11 +23,6 @@
   - Added the required column `coupleId` to the `VaultWish` table without a default value. This is not possible if the table is not empty.
 
 */
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Settings";
-PRAGMA foreign_keys=on;
-
 -- CreateTable
 CREATE TABLE "Couple" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -45,6 +40,17 @@ CREATE TABLE "Couple" (
     "updatedAt" DATETIME NOT NULL
 );
 
+-- Нэг хосын хувилбараас шилжих: Settings дахь хос (байвал) "bid-hoyor" хосын нэртэй Couple болно,
+-- бусад бүх мөр түүнд оноогдоно. Хоосон өгөгдлийн сан дээр юу ч хуулагдахгүй.
+INSERT INTO "Couple" ("id", "handle", "nameA", "nameB", "startDate", "nextMeet", "cityA", "cityB", "passwordHash", "vaultPinHash", "version", "createdAt", "updatedAt")
+SELECT 'c_legacy', 'bid-hoyor', "nameA", "nameB", "startDate", "nextMeet", "cityA", "cityB", "passwordHash", "vaultPinHash", "version", "updatedAt", "updatedAt" FROM "Settings";
+
+-- DropTable
+PRAGMA foreign_keys=off;
+DROP TABLE "Settings";
+PRAGMA foreign_keys=on;
+
+
 -- RedefineTables
 PRAGMA defer_foreign_keys=ON;
 PRAGMA foreign_keys=OFF;
@@ -57,7 +63,7 @@ CREATE TABLE "new_AvatarImage" (
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "AvatarImage_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_AvatarImage" ("data", "mime", "updatedAt", "who") SELECT "data", "mime", "updatedAt", "who" FROM "AvatarImage";
+INSERT INTO "new_AvatarImage" ("id", "coupleId", "data", "mime", "updatedAt", "who") SELECT 'av_' || "who", 'c_legacy', "data", "mime", "updatedAt", "who" FROM "AvatarImage";
 DROP TABLE "AvatarImage";
 ALTER TABLE "new_AvatarImage" RENAME TO "AvatarImage";
 CREATE UNIQUE INDEX "AvatarImage_coupleId_who_key" ON "AvatarImage"("coupleId", "who");
@@ -70,7 +76,7 @@ CREATE TABLE "new_BucketItem" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "BucketItem_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_BucketItem" ("by", "createdAt", "doneAt", "id", "text") SELECT "by", "createdAt", "doneAt", "id", "text" FROM "BucketItem";
+INSERT INTO "new_BucketItem" ("coupleId", "by", "createdAt", "doneAt", "id", "text") SELECT 'c_legacy', "by", "createdAt", "doneAt", "id", "text" FROM "BucketItem";
 DROP TABLE "BucketItem";
 ALTER TABLE "new_BucketItem" RENAME TO "BucketItem";
 CREATE INDEX "BucketItem_coupleId_idx" ON "BucketItem"("coupleId");
@@ -83,7 +89,7 @@ CREATE TABLE "new_DateIdea" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "DateIdea_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_DateIdea" ("by", "createdAt", "emoji", "id", "text") SELECT "by", "createdAt", "emoji", "id", "text" FROM "DateIdea";
+INSERT INTO "new_DateIdea" ("coupleId", "by", "createdAt", "emoji", "id", "text") SELECT 'c_legacy', "by", "createdAt", "emoji", "id", "text" FROM "DateIdea";
 DROP TABLE "DateIdea";
 ALTER TABLE "new_DateIdea" RENAME TO "DateIdea";
 CREATE INDEX "DateIdea_coupleId_idx" ON "DateIdea"("coupleId");
@@ -96,7 +102,7 @@ CREATE TABLE "new_DateLog" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "DateLog_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_DateLog" ("by", "createdAt", "emoji", "id", "text") SELECT "by", "createdAt", "emoji", "id", "text" FROM "DateLog";
+INSERT INTO "new_DateLog" ("coupleId", "by", "createdAt", "emoji", "id", "text") SELECT 'c_legacy', "by", "createdAt", "emoji", "id", "text" FROM "DateLog";
 DROP TABLE "DateLog";
 ALTER TABLE "new_DateLog" RENAME TO "DateLog";
 CREATE INDEX "DateLog_coupleId_idx" ON "DateLog"("coupleId");
@@ -110,7 +116,7 @@ CREATE TABLE "new_GameAnswer" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "GameAnswer_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_GameAnswer" ("by", "choice", "createdAt", "game", "id", "q") SELECT "by", "choice", "createdAt", "game", "id", "q" FROM "GameAnswer";
+INSERT INTO "new_GameAnswer" ("coupleId", "by", "choice", "createdAt", "game", "id", "q") SELECT 'c_legacy', "by", "choice", "createdAt", "game", "id", "q" FROM "GameAnswer";
 DROP TABLE "GameAnswer";
 ALTER TABLE "new_GameAnswer" RENAME TO "GameAnswer";
 CREATE UNIQUE INDEX "GameAnswer_coupleId_game_q_by_key" ON "GameAnswer"("coupleId", "game", "q", "by");
@@ -124,7 +130,7 @@ CREATE TABLE "new_Letter" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Letter_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_Letter" ("body", "by", "createdAt", "id", "openedAt", "title") SELECT "body", "by", "createdAt", "id", "openedAt", "title" FROM "Letter";
+INSERT INTO "new_Letter" ("coupleId", "body", "by", "createdAt", "id", "openedAt", "title") SELECT 'c_legacy', "body", "by", "createdAt", "id", "openedAt", "title" FROM "Letter";
 DROP TABLE "Letter";
 ALTER TABLE "new_Letter" RENAME TO "Letter";
 CREATE INDEX "Letter_coupleId_idx" ON "Letter"("coupleId");
@@ -139,7 +145,7 @@ CREATE TABLE "new_ListItem" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "ListItem_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_ListItem" ("by", "createdAt", "doneAt", "id", "title", "type", "url") SELECT "by", "createdAt", "doneAt", "id", "title", "type", "url" FROM "ListItem";
+INSERT INTO "new_ListItem" ("coupleId", "by", "createdAt", "doneAt", "id", "title", "type", "url") SELECT 'c_legacy', "by", "createdAt", "doneAt", "id", "title", "type", "url" FROM "ListItem";
 DROP TABLE "ListItem";
 ALTER TABLE "new_ListItem" RENAME TO "ListItem";
 CREATE INDEX "ListItem_coupleId_idx" ON "ListItem"("coupleId");
@@ -154,7 +160,7 @@ CREATE TABLE "new_Memory" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Memory_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_Memory" ("by", "createdAt", "date", "id", "place", "story", "title") SELECT "by", "createdAt", "date", "id", "place", "story", "title" FROM "Memory";
+INSERT INTO "new_Memory" ("coupleId", "by", "createdAt", "date", "id", "place", "story", "title") SELECT 'c_legacy', "by", "createdAt", "date", "id", "place", "story", "title" FROM "Memory";
 DROP TABLE "Memory";
 ALTER TABLE "new_Memory" RENAME TO "Memory";
 CREATE INDEX "Memory_coupleId_idx" ON "Memory"("coupleId");
@@ -174,7 +180,7 @@ CREATE TABLE "new_Moment" (
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Moment_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_Moment" ("by", "caption", "createdAt", "day", "filter", "id", "mime", "mood", "photo", "reaction", "thumb", "updatedAt") SELECT "by", "caption", "createdAt", "day", "filter", "id", "mime", "mood", "photo", "reaction", "thumb", "updatedAt" FROM "Moment";
+INSERT INTO "new_Moment" ("coupleId", "by", "caption", "createdAt", "day", "filter", "id", "mime", "mood", "photo", "reaction", "thumb", "updatedAt") SELECT 'c_legacy', "by", "caption", "createdAt", "day", "filter", "id", "mime", "mood", "photo", "reaction", "thumb", "updatedAt" FROM "Moment";
 DROP TABLE "Moment";
 ALTER TABLE "new_Moment" RENAME TO "Moment";
 CREATE INDEX "Moment_coupleId_day_idx" ON "Moment"("coupleId", "day");
@@ -190,7 +196,7 @@ CREATE TABLE "new_Note" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Note_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_Note" ("by", "color", "createdAt", "id", "likedA", "likedB", "text") SELECT "by", "color", "createdAt", "id", "likedA", "likedB", "text" FROM "Note";
+INSERT INTO "new_Note" ("coupleId", "by", "color", "createdAt", "id", "likedA", "likedB", "text") SELECT 'c_legacy', "by", "color", "createdAt", "id", "likedA", "likedB", "text" FROM "Note";
 DROP TABLE "Note";
 ALTER TABLE "new_Note" RENAME TO "Note";
 CREATE INDEX "Note_coupleId_idx" ON "Note"("coupleId");
@@ -201,7 +207,7 @@ CREATE TABLE "new_Nudge" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Nudge_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_Nudge" ("by", "createdAt", "id") SELECT "by", "createdAt", "id" FROM "Nudge";
+INSERT INTO "new_Nudge" ("coupleId", "by", "createdAt", "id") SELECT 'c_legacy', "by", "createdAt", "id" FROM "Nudge";
 DROP TABLE "Nudge";
 ALTER TABLE "new_Nudge" RENAME TO "Nudge";
 CREATE INDEX "Nudge_coupleId_createdAt_idx" ON "Nudge"("coupleId", "createdAt");
@@ -215,7 +221,7 @@ CREATE TABLE "new_QotdAnswer" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "QotdAnswer_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_QotdAnswer" ("by", "createdAt", "day", "id", "question", "text") SELECT "by", "createdAt", "day", "id", "question", "text" FROM "QotdAnswer";
+INSERT INTO "new_QotdAnswer" ("coupleId", "by", "createdAt", "day", "id", "question", "text") SELECT 'c_legacy', "by", "createdAt", "day", "id", "question", "text" FROM "QotdAnswer";
 DROP TABLE "QotdAnswer";
 ALTER TABLE "new_QotdAnswer" RENAME TO "QotdAnswer";
 CREATE UNIQUE INDEX "QotdAnswer_coupleId_day_by_key" ON "QotdAnswer"("coupleId", "day", "by");
@@ -231,7 +237,7 @@ CREATE TABLE "new_QuizQuestion" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "QuizQuestion_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_QuizQuestion" ("answer", "by", "correct", "createdAt", "guess", "guessedAt", "id", "question") SELECT "answer", "by", "correct", "createdAt", "guess", "guessedAt", "id", "question" FROM "QuizQuestion";
+INSERT INTO "new_QuizQuestion" ("coupleId", "answer", "by", "correct", "createdAt", "guess", "guessedAt", "id", "question") SELECT 'c_legacy', "answer", "by", "correct", "createdAt", "guess", "guessedAt", "id", "question" FROM "QuizQuestion";
 DROP TABLE "QuizQuestion";
 ALTER TABLE "new_QuizQuestion" RENAME TO "QuizQuestion";
 CREATE INDEX "QuizQuestion_coupleId_idx" ON "QuizQuestion"("coupleId");
@@ -246,7 +252,7 @@ CREATE TABLE "new_SpecialDay" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "SpecialDay_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_SpecialDay" ("by", "createdAt", "date", "emoji", "id", "title", "yearly") SELECT "by", "createdAt", "date", "emoji", "id", "title", "yearly" FROM "SpecialDay";
+INSERT INTO "new_SpecialDay" ("coupleId", "by", "createdAt", "date", "emoji", "id", "title", "yearly") SELECT 'c_legacy', "by", "createdAt", "date", "emoji", "id", "title", "yearly" FROM "SpecialDay";
 DROP TABLE "SpecialDay";
 ALTER TABLE "new_SpecialDay" RENAME TO "SpecialDay";
 CREATE INDEX "SpecialDay_coupleId_idx" ON "SpecialDay"("coupleId");
@@ -258,7 +264,7 @@ CREATE TABLE "new_SyncTimer" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "SyncTimer_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_SyncTimer" ("at", "by", "createdAt", "id") SELECT "at", "by", "createdAt", "id" FROM "SyncTimer";
+INSERT INTO "new_SyncTimer" ("coupleId", "at", "by", "createdAt", "id") SELECT 'c_legacy', "at", "by", "createdAt", "id" FROM "SyncTimer";
 DROP TABLE "SyncTimer";
 ALTER TABLE "new_SyncTimer" RENAME TO "SyncTimer";
 CREATE INDEX "SyncTimer_coupleId_idx" ON "SyncTimer"("coupleId");
@@ -275,7 +281,7 @@ CREATE TABLE "new_VaultPhoto" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "VaultPhoto_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_VaultPhoto" ("by", "caption", "createdAt", "data", "id", "mime", "thumb", "viewOnce", "viewedAt") SELECT "by", "caption", "createdAt", "data", "id", "mime", "thumb", "viewOnce", "viewedAt" FROM "VaultPhoto";
+INSERT INTO "new_VaultPhoto" ("coupleId", "by", "caption", "createdAt", "data", "id", "mime", "thumb", "viewOnce", "viewedAt") SELECT 'c_legacy', "by", "caption", "createdAt", "data", "id", "mime", "thumb", "viewOnce", "viewedAt" FROM "VaultPhoto";
 DROP TABLE "VaultPhoto";
 ALTER TABLE "new_VaultPhoto" RENAME TO "VaultPhoto";
 CREATE INDEX "VaultPhoto_coupleId_idx" ON "VaultPhoto"("coupleId");
@@ -288,7 +294,7 @@ CREATE TABLE "new_VaultWish" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "VaultWish_coupleId_fkey" FOREIGN KEY ("coupleId") REFERENCES "Couple" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_VaultWish" ("answer", "by", "createdAt", "id", "item") SELECT "answer", "by", "createdAt", "id", "item" FROM "VaultWish";
+INSERT INTO "new_VaultWish" ("coupleId", "answer", "by", "createdAt", "id", "item") SELECT 'c_legacy', "answer", "by", "createdAt", "id", "item" FROM "VaultWish";
 DROP TABLE "VaultWish";
 ALTER TABLE "new_VaultWish" RENAME TO "VaultWish";
 CREATE UNIQUE INDEX "VaultWish_coupleId_item_by_key" ON "VaultWish"("coupleId", "item", "by");
