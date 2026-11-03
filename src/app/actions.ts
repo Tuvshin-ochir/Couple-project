@@ -25,10 +25,13 @@ import {
   WISHES,
   WOULD_YOU_RATHER,
   dailyQuestion,
+  listTypeOf,
   moodOf,
   qotdDay,
 } from "@/lib/content";
-import { dayKey, isDayKey, keyToUTC, validTz } from "@/lib/time";
+import { toListenState } from "@/lib/listen";
+import { isHere } from "@/lib/presence";
+import { dayKey, fmtKey, isDayKey, keyToUTC, validTz } from "@/lib/time";
 import { isWho, other, type City, type Who } from "@/lib/types";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
@@ -55,6 +58,11 @@ function notifyPartner(s: Couple, me: Who, make: (myName: string) => PushPayload
 }
 
 const str = (fd: FormData, key: string, max = 2000) => String(fd.get(key) ?? "").trim().slice(0, max);
+
+/** Санамсаргүй нэгийг — мэдэгдэл бүр арай өөр, амьд сонсогдоно */
+const pick = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)];
+const quote = (t: string, max = 90) => `“${t.length > max ? `${t.slice(0, max - 1)}…` : t}”`;
+const ytThumb = (videoId: string) => `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
 // ───────── Бүртгэл, нэвтрэлт ─────────
 
@@ -123,19 +131,21 @@ export async function deleteCouple(_: FormState, fd: FormData): Promise<FormStat
 // ───────── Санаж байна ─────────
 
 const MISS_LINES = [
-  "Хайр чинь чамайг санаж байна гэнээ 🥺",
-  "Яг одоо чамайг бодож байна 💭",
-  "Чамд нэг том тэврэлт илгээлээ 🤗",
-  "Чамайг маш их санаж байна",
-  "Чамгүй өдөр их урт байна гэнээ",
+  "Хайр чинь чамайг санаж байна гэнээ 🥺💗",
+  "Яг одоо чамайг бодож байна 💭💞",
+  "Чамд нэг том тэврэлт илгээлээ 🤗💕",
+  "Чамайг маш их санаж байна 💘",
+  "Чамгүй өдөр их урт байна гэнээ 🥹❤️",
+  "Холоос үнсэлт илгээлээ 😘💋",
+  "Зүрх нь чам руу тэмүүлж байна 💓",
 ];
 
 export async function sendNudge() {
   const { s, me, cid, db } = await auth();
   await db.nudge.create({ data: { coupleId: cid, by: me } });
   notifyPartner(s, me, (name) => ({
-    title: name,
-    body: MISS_LINES[Math.floor(Math.random() * MISS_LINES.length)],
+    title: `${name} 💗`,
+    body: pick(MISS_LINES),
     url: `/?miss=${Date.now()}`,
     tag: "miss",
   }));
@@ -153,15 +163,23 @@ export async function addNote(fd: FormData) {
   await db.note.create({
     data: { coupleId: cid, by: me, text, color: (NOTE_COLORS as readonly string[]).includes(color) ? color : "pink" },
   });
-  notifyPartner(s, me, (name) => ({ title: `${name} зурвас үлдээлээ`, body: text.slice(0, 140), url: "/notes", tag: "note" }));
+  notifyPartner(s, me, (name) => ({ title: `💌 ${name} зурвас үлдээлээ`, body: text.slice(0, 160), url: "/notes", tag: "note" }));
   await done(cid);
 }
 
 export async function toggleLike(id: string) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const n = await db.note.findUnique({ where: { id } });
   if (!n) return;
-  await db.note.update({ where: { id }, data: me === "a" ? { likedA: !n.likedA } : { likedB: !n.likedB } });
+  const liking = !(me === "a" ? n.likedA : n.likedB);
+  await db.note.update({ where: { id }, data: me === "a" ? { likedA: liking } : { likedB: liking } });
+  if (liking && n.by !== me)
+    notifyPartner(s, me, (name) => ({
+      title: `❤️ ${name} зурвасанд чинь зүрх дарлаа`,
+      body: `${quote(n.text)} ${pick(["— таалагдчихжээ 🥰", "— зүрхэнд нь хүрчээ 💘", "— инээмсэглэчихлээ ☺️💕"])}`,
+      url: "/notes",
+      tag: "like",
+    }));
   await done(cid);
 }
 
@@ -180,8 +198,8 @@ export async function addLetter(fd: FormData) {
   if (!title || !body) return;
   await db.letter.create({ data: { coupleId: cid, by: me, title, body } });
   notifyPartner(s, me, (name) => ({
-    title: `${name} чамд захидал бичлээ ✉️`,
-    body: `"${title}" — нээх үедээ уншаарай`,
+    title: `✉️ ${name} чамд захидал бичлээ`,
+    body: `${quote(title)} — битүүмжтэй байгаа, нээх цагаа өөрөө сонгоорой 🔐💕`,
     url: "/notes?tab=letters",
     tag: "letter",
   }));
@@ -190,11 +208,17 @@ export async function addLetter(fd: FormData) {
 
 /** Хүлээн авагч нээнэ — агуулга нь зөвхөн энэ үед клиент рүү очно */
 export async function openLetter(id: string) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const l = await db.letter.findUnique({ where: { id } });
   if (!l) return null;
   if (l.by !== me && !l.openedAt) {
     await db.letter.update({ where: { id }, data: { openedAt: new Date() } });
+    notifyPartner(s, me, (name) => ({
+      title: `💌 ${name} захидлыг чинь нээлээ`,
+      body: `${quote(l.title)} — яг одоо уншиж байна 🥹💞`,
+      url: "/notes?tab=letters",
+      tag: "letter-open",
+    }));
     await done(cid);
   }
   return { title: l.title, body: l.body };
@@ -209,7 +233,7 @@ export async function deleteLetter(id: string) {
 // ───────── Дурсамж ─────────
 
 export async function addMemory(fd: FormData): Promise<FormState> {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const title = str(fd, "title", 100);
   const date = str(fd, "date", 10);
   if (!title || !isDayKey(date)) return { error: "Гарчиг, огноогоо оруулна уу" };
@@ -232,6 +256,12 @@ export async function addMemory(fd: FormData): Promise<FormState> {
       photos: { create: photos },
     },
   });
+  notifyPartner(s, me, (name) => ({
+    title: `🖼️ ${name} шинэ дурсамж нэмлээ`,
+    body: `${quote(title)}${photos.length ? ` · ${photos.length} зураг` : ""} — хамтдаа эргэн дурсъя 💕`,
+    url: "/memories",
+    tag: "memory",
+  }));
   await done(cid);
   return { ok: true };
 }
@@ -245,18 +275,31 @@ export async function deleteMemory(id: string) {
 // ───────── Мөрөөдлийн жагсаалт ─────────
 
 export async function addBucket(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const text = str(fd, "text", 140);
   if (!text) return;
   await db.bucketItem.create({ data: { coupleId: cid, by: me, text } });
+  notifyPartner(s, me, (name) => ({
+    title: `✨ ${name} мөрөөдөл нэмлээ`,
+    body: `${quote(text)} — хамтдаа биелүүлье 🤞💞`,
+    url: "/bucket",
+    tag: "bucket",
+  }));
   await done(cid);
 }
 
 export async function toggleBucket(id: string) {
-  const { cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const b = await db.bucketItem.findUnique({ where: { id } });
   if (!b) return;
   await db.bucketItem.update({ where: { id }, data: { doneAt: b.doneAt ? null : new Date() } });
+  if (!b.doneAt)
+    notifyPartner(s, me, (name) => ({
+      title: "🎉 Мөрөөдөл биеллээ!",
+      body: `${quote(b.text)} — ${name} биелсэн гэж тэмдэглэлээ 🥳❤️`,
+      url: "/bucket",
+      tag: "bucket",
+    }));
   await done(cid);
 }
 
@@ -312,8 +355,8 @@ export async function postMoment(fd: FormData): Promise<FormState> {
   });
   if (!existed)
     notifyPartner(s, me, (name) => ({
-      title: `${name} өдрийн мөчөө хуваалцлаа 📸`,
-      body: data.caption || moodOf(mood).label,
+      title: `📸 ${name} өдрийн мөчөө хуваалцлаа`,
+      body: `${moodOf(mood).emoji} ${data.caption || moodOf(mood).label} — ${pick(["чи ч бас хуваалцвал харагдана 👀💞", "өнөөдрийн чинь мөчийг хүлээж байна 🥰", "нэг хараад үзээрэй 💕"])}`,
       url: "/moment",
       tag: "moment",
     }));
@@ -330,7 +373,12 @@ export async function reactMoment(id: string, emoji: string) {
   const removing = m.reaction === emoji;
   await db.moment.update({ where: { id }, data: { reaction: removing ? null : emoji } });
   if (!removing)
-    notifyPartner(s, me, (name) => ({ title: `${name} чиний мөчид ${emoji} үлдээлээ`, body: "Өдрийн мөч", url: "/moment", tag: "react" }));
+    notifyPartner(s, me, (name) => ({
+      title: `${emoji} ${name} мөчид чинь хариу үлдээлээ`,
+      body: pick(["Мөч чинь таалагдсан бололтой 🥰", "Хайрт чинь харчихлаа 👀💕", "Зүрхэнд нь хүрчээ 💘"]),
+      url: "/moment",
+      tag: "react",
+    }));
   await done(cid);
 }
 
@@ -367,7 +415,7 @@ export async function removeAvatar(who: string) {
 // ───────── Чухал өдрүүд ─────────
 
 export async function addDay(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const title = str(fd, "title", 80);
   const date = str(fd, "date", 10);
   if (!title || !isDayKey(date)) return;
@@ -381,6 +429,12 @@ export async function addDay(fd: FormData) {
       yearly: fd.get("yearly") === "on",
     },
   });
+  notifyPartner(s, me, (name) => ({
+    title: `📅 ${name} чухал өдөр тэмдэглэлээ`,
+    body: `${DAY_TYPES.some(([e]) => e === emoji) ? emoji : "📌"} ${title} · ${fmtKey(date)} — мартахгүй шүү 💕`,
+    url: "/days",
+    tag: "day",
+  }));
   await done(cid);
 }
 
@@ -393,12 +447,19 @@ export async function deleteDay(id: string) {
 // ───────── Хамтын жагсаалт ─────────
 
 export async function addListItem(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const title = str(fd, "title", 120);
   const type = str(fd, "type", 20);
   if (!title || !LIST_TYPES.some((t) => t.key === type)) return;
   const url = str(fd, "url", 500);
   await db.listItem.create({ data: { coupleId: cid, by: me, type, title, url: /^https?:\/\//i.test(url) ? url : "" } });
+  const t = listTypeOf(type);
+  notifyPartner(s, me, (name) => ({
+    title: `${t.emoji} ${name} жагсаалтад нэмлээ`,
+    body: `${t.label}: ${quote(title)} — хамтдаа ${t.done.toLowerCase()} болно 💞`,
+    url: "/lists",
+    tag: "list",
+  }));
   await done(cid);
 }
 
@@ -419,10 +480,16 @@ export async function deleteListItem(id: string) {
 // ───────── Болзоо ─────────
 
 export async function addIdea(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const text = str(fd, "text", 140);
   if (!text) return;
   await db.dateIdea.create({ data: { coupleId: cid, by: me, text } });
+  notifyPartner(s, me, (name) => ({
+    title: `💡 ${name} болзооны санаа нэмлээ`,
+    body: `${quote(text)} — хэзээ хийх вэ? 😍`,
+    url: "/dates",
+    tag: "idea",
+  }));
   await done(cid);
 }
 
@@ -433,10 +500,17 @@ export async function deleteIdea(id: string) {
 }
 
 export async function logDate(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const text = str(fd, "text", 140);
   if (!text) return;
-  await db.dateLog.create({ data: { coupleId: cid, by: me, text, emoji: str(fd, "emoji", 8) || "💞" } });
+  const emoji = str(fd, "emoji", 8) || "💞";
+  await db.dateLog.create({ data: { coupleId: cid, by: me, text, emoji } });
+  notifyPartner(s, me, (name) => ({
+    title: `🥂 ${name} болзоогоо тэмдэглэлээ`,
+    body: `${emoji} ${text} — дахиад ийм болзоо хийе 💕`,
+    url: "/dates",
+    tag: "datelog",
+  }));
   await done(cid);
 }
 
@@ -452,8 +526,8 @@ export async function startSync(seconds: number) {
   await db.syncTimer.deleteMany({});
   await db.syncTimer.create({ data: { coupleId: cid, by: me, at: new Date(Date.now() + seconds * 1000) } });
   notifyPartner(s, me, (name) => ({
-    title: `${name} зэрэг эхлүүлэх тоолуур асаалаа`,
-    body: `${seconds} секундийн дараа эхэлнэ — одоо нээгээрэй`,
+    title: `⏱️ ${name} зэрэг эхлүүлэх тоолуур асаалаа`,
+    body: `${seconds} секундийн дараа хамт эхэлнэ — яг одоо нээгээрэй 🍿💞`,
     url: "/dates",
     tag: "sync",
   }));
@@ -470,8 +544,8 @@ export async function answerQotd(fd: FormData) {
   const existed = await db.qotdAnswer.findUnique({ where: { coupleId_day_by: { coupleId: cid, day, by: me } }, select: { id: true } });
   if (!existed)
     notifyPartner(s, me, (name) => ({
-      title: `${name} өнөөдрийн асуултад хариуллаа`,
-      body: "Чи ч бас хариулбал бие биенийхээ хариултыг харна",
+      title: `💭 ${name} өнөөдрийн асуултад хариуллаа`,
+      body: "Чи ч бас хариулбал бие биенийхээ хариултыг харна ✨💕",
       url: "/games",
       tag: "qotd",
     }));
@@ -496,29 +570,48 @@ export async function chooseAnswer(game: string, q: number, choice: number) {
 }
 
 export async function addQuiz(fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const question = str(fd, "question", 140);
   const answer = str(fd, "answer", 140);
   if (!question || !answer) return;
   await db.quizQuestion.create({ data: { coupleId: cid, by: me, question, answer } });
+  notifyPartner(s, me, (name) => ({
+    title: `🎯 ${name} чамд асуулт бэлдлээ`,
+    body: `${quote(question)} — намайг хэр мэддэгээ харуулаарай 😉💕`,
+    url: "/games?tab=quiz",
+    tag: "quiz",
+  }));
   await done(cid);
 }
 
 export async function guessQuiz(id: string, fd: FormData) {
-  const { me, cid, db } = await auth();
+  const { s, me, cid, db } = await auth();
   const guess = str(fd, "guess", 140);
   if (!guess) return;
   // Зөвхөн хайртынхаа асуултад таана
-  await db.quizQuestion.updateMany({
+  const r = await db.quizQuestion.updateMany({
     where: { id, by: { not: me }, guess: null },
     data: { guess, guessedAt: new Date() },
   });
+  if (r.count)
+    notifyPartner(s, me, (name) => ({
+      title: `🤔 ${name} асуултад чинь хариуллаа`,
+      body: "Зөв таасан уу? Ороод шалгаарай 👀💕",
+      url: "/games?tab=quiz",
+      tag: "quiz",
+    }));
   await done(cid);
 }
 
 export async function judgeQuiz(id: string, correct: boolean) {
-  const { me, cid, db } = await auth();
-  await db.quizQuestion.updateMany({ where: { id, by: { not: me } }, data: { correct } });
+  const { s, me, cid, db } = await auth();
+  const r = await db.quizQuestion.updateMany({ where: { id, by: { not: me } }, data: { correct } });
+  if (r.count)
+    notifyPartner(s, me, (name) =>
+      correct
+        ? { title: "🎯 Зөв таалаа!", body: `${name}: “Чи намайг үнэхээр сайн мэддэг юм аа” 🥰💘`, url: "/games?tab=quiz", tag: "quiz" }
+        : { title: "😜 Энэ удаад таасангүй", body: `${name} зөв хариултаа харуулчихлаа — дараагийнхыг таана биз 💕`, url: "/games?tab=quiz", tag: "quiz" },
+    );
   await done(cid);
 }
 
@@ -545,7 +638,7 @@ function cityFrom(fd: FormData, k: "A" | "B"): City | null {
 }
 
 export async function saveProfile(_: FormState, fd: FormData): Promise<FormState> {
-  const { cid } = await auth();
+  const { s, me, cid } = await auth();
   const nameA = str(fd, "nameA", 30);
   const nameB = str(fd, "nameB", 30);
   if (!nameA || !nameB) return { error: "Хоёулангийн нэрийг оруулна уу" };
@@ -569,6 +662,17 @@ export async function saveProfile(_: FormState, fd: FormData): Promise<FormState
       cityB: cityB ? JSON.stringify(cityB) : null,
     },
   });
+  // Уулзах өдөр шинээр тохирсон/өөрчлөгдсөн бол — хайртынх нь цагаар огноог бичнэ
+  const meetValid = meetDate && !Number.isNaN(meetDate.getTime()) && meetDate.getTime() > Date.now();
+  if (meetValid && meetDate.getTime() !== s.nextMeet?.getTime()) {
+    const tz = (other(me) === "a" ? cityA : cityB)?.tz ?? "Asia/Ulaanbaatar";
+    notifyPartner(s, me, (name) => ({
+      title: "✈️ Уулзах өдөр тохирлоо!",
+      body: `${fmtKey(dayKey(meetDate, tz))} — ${name} тоолуур эхлүүллээ, удахгүй тэврэлцэнэ 🥹💞`,
+      url: "/",
+      tag: "meet",
+    }));
+  }
   await done(cid);
   return { ok: true };
 }
@@ -672,7 +776,12 @@ export async function addVaultPhoto(fd: FormData): Promise<FormState> {
     },
   });
   // Агуулгыг дэлгэцэн дээр ил гаргахгүй — нэр ч оруулахгүй
-  notifyPartner(s, me, () => ({ title: "🔒 Нууц өрөөнд шинэ зүйл ирлээ", body: "Нээж харах уу? 😏", url: "/vault", tag: "vault" }));
+  notifyPartner(s, me, () => ({
+    title: "🔒 Нууц өрөөнд шинэ зүйл ирлээ",
+    body: pick(["Нээж харах уу? 😏🔥", "Зөвхөн чамд зориулсан 🤫❤️‍🔥", "Ганцаараа байхдаа нээгээрэй 😉"]),
+    url: "/vault",
+    tag: "vault",
+  }));
   await done(cid);
   return { ok: true };
 }
@@ -742,17 +851,78 @@ export async function addSong(fd: FormData): Promise<FormState> {
     // сүлжээний алдаа — нэргүйгээр нэмнэ
   }
   await db.song.create({ data: { coupleId: cid, by: me, videoId, title, author, note: str(fd, "note", 140) } });
-  notifyPartner(s, me, (name) => ({ title: `${name} шинэ дуу нэмлээ 🎵`, body: title, url: "/music", tag: "song" }));
+  notifyPartner(s, me, (name) => ({
+    title: `🎶 ${name} Our taste-д дуу нэмлээ`,
+    body: `${quote(title)} — хамт сонсъё 🎧💕`,
+    url: "/music",
+    tag: "song",
+    image: ytThumb(videoId),
+  }));
   await done(cid);
   return { ok: true };
 }
 
 export async function toggleSongLike(id: string) {
-  const { me, cid, db } = await auth();
-  const song = await db.song.findUnique({ where: { id }, select: { likedA: true, likedB: true } });
+  const { s, me, cid, db } = await auth();
+  const song = await db.song.findUnique({ where: { id }, select: { likedA: true, likedB: true, by: true, title: true } });
   if (!song) return;
-  await db.song.update({ where: { id }, data: me === "a" ? { likedA: !song.likedA } : { likedB: !song.likedB } });
+  const liking = !(me === "a" ? song.likedA : song.likedB);
+  await db.song.update({ where: { id }, data: me === "a" ? { likedA: liking } : { likedB: liking } });
+  if (liking && song.by !== me)
+    notifyPartner(s, me, (name) => ({
+      title: `💗 ${name} таны дуунд зүрх дарлаа`,
+      body: `${quote(song.title)} — амтанд нь таарчээ 🎧🥰`,
+      url: "/music",
+      tag: "song-like",
+    }));
   await done(cid);
+}
+
+// ── Хамт сонсох ──
+// Нэг нь дуу тоглуулахад төлөв хадгалагдаж, нөгөө нь Our taste-д орвол яг ижил секундээс
+// тоглоно (MusicPlayer нь /api/listen-ээр 2 секунд тутам шалгана). Хуудас бүхэлдээ шинэчлэгдэх
+// шаардлагагүй тул done() дуудахгүй.
+
+/** Тоглуулах (шинэ дуу, үргэлжлүүлэх, гүйлгэх) — position: хэдэн секундээс */
+export async function listenPlay(songId: string, position = 0) {
+  const { s, me, cid, db } = await auth();
+  const song = await db.song.findFirst({ where: { id: songId }, select: { videoId: true, title: true } });
+  if (!song) return null;
+  const now = Date.now();
+  const pos = Math.min(Math.max(Number(position) || 0, 0), 6 * 3600);
+  const prev = await prisma.listen.findUnique({ where: { coupleId: cid }, select: { notifiedAt: true } });
+  // Хайрт нь хуудсандаа байхгүй, сүүлийн 5 минутад мэдэгдэл аваагүй бол л — дуу алгасах бүрт биш
+  const notify = !isHere(cid, other(me)) && now - (prev?.notifiedAt?.getTime() ?? 0) > 5 * 60_000;
+  const data = {
+    by: me,
+    songId,
+    videoId: song.videoId,
+    title: song.title,
+    startedAt: new Date(now - pos * 1000),
+    pausedAt: null,
+    changedAt: new Date(now),
+    ...(notify ? { notifiedAt: new Date(now) } : {}),
+  };
+  const l = await prisma.listen.upsert({ where: { coupleId: cid }, create: { coupleId: cid, ...data }, update: data });
+  if (notify)
+    notifyPartner(s, me, (name) => ({
+      title: `🎧 ${name} дуу тоглуулж байна`,
+      body: `${quote(song.title)} — ороод хамт сонсоорой, яг ижил секундээс эхэлнэ 💞`,
+      url: "/music?listen=1",
+      tag: "listen",
+      image: ytThumb(song.videoId),
+    }));
+  return { state: toListenState(l), now };
+}
+
+/** Түр зогсоох — хоёулангийнх нь дуу зогсоно */
+export async function listenPause(position: number) {
+  const { me, cid } = await auth();
+  const pos = Math.min(Math.max(Number(position) || 0, 0), 6 * 3600);
+  const now = Date.now();
+  const r = await prisma.listen.updateMany({ where: { coupleId: cid }, data: { by: me, pausedAt: pos, changedAt: new Date(now) } });
+  if (!r.count) return null;
+  return { state: toListenState(await prisma.listen.findUnique({ where: { coupleId: cid } })), now };
 }
 
 export async function deleteSong(id: string) {

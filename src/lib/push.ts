@@ -26,6 +26,7 @@ export type PushPayload = {
   body: string;
   url: string; // мэдэгдэл дээр дарахад нээгдэх хуудас
   tag?: string; // ижил tag-тай мэдэгдлүүд нэг мөр болно
+  image?: string; // Android дээр том зураг (дууны нүүр г.м)
 };
 
 /** Хосын нэг хүний бүх төхөөрөмж рүү илгээнэ; хүчингүй болсон бүртгэлийг устгана */
@@ -35,14 +36,17 @@ export async function pushTo(coupleId: string, who: Who, payload: PushPayload) {
   await Promise.all(
     subs.map(async (s) => {
       try {
+        // Утас унтраастай байсан ч 24 цагийн дотор асвал хүрнэ; high — iOS/Android шууд сэрээнэ
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
           JSON.stringify(payload),
-          { TTL: 60 * 60 * 6, urgency: "high" },
+          { TTL: 60 * 60 * 24, urgency: "high" },
         );
       } catch (e) {
         const code = (e as { statusCode?: number }).statusCode;
-        if (code === 404 || code === 410) await prisma.pushSubscription.deleteMany({ where: { id: s.id } });
+        // 404/410 — бүртгэл хүчингүй; 403 — өөр VAPID түлхүүрээр бүртгэгдсэн. Клиент дараа нь дахин бүртгэнэ (Live)
+        if (code === 404 || code === 410 || code === 403) await prisma.pushSubscription.deleteMany({ where: { id: s.id } });
+        else console.error("push failed", code ?? "", (e as Error).message?.slice(0, 200));
       }
     }),
   );

@@ -47,6 +47,7 @@ model Couple {
   quiz        QuizQuestion[]
   songs       Song[]
   pushSubs    PushSubscription[]
+  listen      Listen?
 }
 
 // "Our taste" — хамтын playlist (YouTube)
@@ -64,6 +65,20 @@ model Song {
   createdAt DateTime @default(now())
 
   @@unique([coupleId, videoId])
+}
+
+// "Хамт сонсох" — хосын одоо тоглож буй дуу. Хоёулаа startedAt-аас тооцож ижил секундэд сонсоно.
+model Listen {
+  coupleId   String    @id
+  couple     Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  by         String // сүүлд тоглуулсан/зогсоосон хүн
+  songId     String
+  videoId    String
+  title      String
+  startedAt  DateTime // тоглож байх үед: дууны 0-р секунд таарах серверийн цаг
+  pausedAt   Float? // зогсоосон бол хэдэн секунд дээр (null = тоглож байна)
+  changedAt  DateTime // сүүлд тоглуулсан/зогсоосон цаг (heartbeat-аас тусдаа)
+  notifiedAt DateTime? // хайртад сүүлд мэдэгдэл явуулсан — дараалан тоглуулахад спамгүй
 }
 
 // Утасны push мэдэгдэл — төхөөрөмж бүрийн бүртгэл (who = тэр төхөөрөмж дээр нэвтэрсэн хүн)

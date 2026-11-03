@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { removePushSubscription, savePushSubscription, sendTestPush } from "@/app/actions";
+import { removePushSubscription, sendTestPush } from "@/app/actions";
 import { toast } from "@/lib/fx";
 import { detectDevice, isStandalone, type Device } from "@/lib/device";
+import { ensurePushSubscription, PUSH_OFF_KEY } from "@/lib/push-client";
 import Icon from "./Icon";
 import InstallGuide from "./InstallGuide";
 
@@ -11,15 +12,6 @@ type InstallEvent = Event & { prompt(): Promise<void>; userChoice: Promise<{ out
 type Status = "loading" | "unsupported" | "ios-install" | "denied" | "off" | "on";
 
 const DISMISS_KEY = "bh_push_dismissed";
-
-/** VAPID нийтийн түлхүүрийг (base64url) push бүртгэлд хэрэгтэй байт болгоно */
-function keyBytes(base64url: string) {
-  const b64 = (base64url + "=".repeat((4 - (base64url.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
-  const raw = atob(b64);
-  const out = new Uint8Array(new ArrayBuffer(raw.length));
-  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
-  return out;
-}
 
 /**
  * Утсанд апп шиг суулгах + push мэдэгдэл асаах.
@@ -82,15 +74,12 @@ export default function AppSetup({ vapidKey, variant = "full" }: { vapidKey: str
           setStatus(permission === "denied" ? "denied" : "off");
           return;
         }
-        await navigator.serviceWorker.register("/sw.js", { scope: "/" });
-        const reg = await navigator.serviceWorker.ready;
-        const sub =
-          (await reg.pushManager.getSubscription()) ??
-          (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(vapidKey) }));
-        const r = await savePushSubscription(JSON.parse(JSON.stringify(sub)));
-        if (r?.error) throw new Error(r.error);
+        await ensurePushSubscription(vapidKey);
+        try {
+          localStorage.removeItem(PUSH_OFF_KEY);
+        } catch {}
         setStatus("on");
-        toast("Мэдэгдэл асаалаа — хайрт чинь юм хийвэл утсанд чинь очно");
+        toast("Мэдэгдэл асаалаа 💞 — хайрт чинь юм хийвэл утсанд чинь очно");
       } catch {
         toast("Мэдэгдэл асааж чадсангүй. Дахин оролдоно уу.", "error");
       }
@@ -104,6 +93,9 @@ export default function AppSetup({ vapidKey, variant = "full" }: { vapidKey: str
         await removePushSubscription(sub.endpoint);
         await sub.unsubscribe();
       }
+      try {
+        localStorage.setItem(PUSH_OFF_KEY, "1");
+      } catch {}
       setStatus("off");
       toast("Мэдэгдэл унтарлаа");
     });

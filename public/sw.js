@@ -15,6 +15,7 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(data.title || "Our cave", {
       body: data.body || "",
       icon: "/icons/icon-192.png",
+      image: data.image,
       badge: "/icons/badge-72.png",
       tag: data.tag,
       renotify: Boolean(data.tag),

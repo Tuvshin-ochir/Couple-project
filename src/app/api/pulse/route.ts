@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { readSession } from "@/lib/auth";
-import { scoped } from "@/lib/db";
+import { prisma, scoped } from "@/lib/db";
 import { other } from "@/lib/types";
 
 // Клиент хэдэн секунд тутам шалгадаг жижиг хариу: өгөгдлийн хувилбар,
@@ -14,7 +14,7 @@ export async function GET() {
 
   const by = other(me);
   const latest = { orderBy: { createdAt: "desc" as const }, select: { createdAt: true } };
-  const [sync, nudge, note, letter, qotd, moment, vault, song] = await Promise.all([
+  const [sync, nudge, note, letter, qotd, moment, vault, song, listen] = await Promise.all([
     db.syncTimer.findFirst({ orderBy: { createdAt: "desc" } }),
     db.nudge.findFirst({ where: { by }, ...latest }),
     db.note.findFirst({ where: { by }, ...latest }),
@@ -23,6 +23,7 @@ export async function GET() {
     db.moment.findFirst({ where: { by }, orderBy: { updatedAt: "desc" }, select: { updatedAt: true } }),
     db.vaultPhoto.findFirst({ where: { by }, ...latest }),
     db.song.findFirst({ where: { by }, ...latest }),
+    prisma.listen.findUnique({ where: { coupleId: s.id }, select: { by: true, pausedAt: true, changedAt: true } }),
   ]);
 
   return Response.json(
@@ -38,6 +39,8 @@ export async function GET() {
         moment: moment?.updatedAt.getTime() ?? 0,
         vault: vault?.createdAt.getTime() ?? 0,
         song: song?.createdAt.getTime() ?? 0,
+        // Хайрт нь дуу тоглуулж эхэлсэн (Our taste-ээс гадуур байхад toast гаргана)
+        listen: listen && listen.by === by && listen.pausedAt === null ? listen.changedAt.getTime() : 0,
       },
     },
     { headers: { "Cache-Control": "no-store" } },

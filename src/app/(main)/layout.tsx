@@ -6,6 +6,7 @@ import { Heart } from "@/components/Brand";
 import { BootLoader } from "@/components/Loader";
 import Sidebar from "@/components/Sidebar";
 import { getCtx } from "@/lib/ctx";
+import { vapidPublicKey } from "@/lib/push";
 import { dayKey, daysBetween, utcKey } from "@/lib/time";
 
 // Хосын хувийн хуудсууд — хайлтын системд бүү гарга
@@ -46,7 +47,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
           {together >= 0 && <span> · {together.toLocaleString("en-US")} хоног хамтдаа</span>}
         </footer>
       </main>
-      <Live me={me} names={names} />
+      <Live me={me} names={names} vapidKey={vapidPublicKey()} />
     </div>
   );
 }

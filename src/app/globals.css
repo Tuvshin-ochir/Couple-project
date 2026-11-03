@@ -4419,6 +4419,82 @@ dialog::backdrop {
   font-size: 13px;
 }
 
+/* Утасны браузер дуутай autoplay-г хориглосон үед — нэг товшоод нэгдэнэ */
+.np-tap {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  border: 0;
+  background: rgb(20 12 10 / 62%);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.np-tap b {
+  font-size: 17px;
+}
+
+/* ── Хамт сонсох мөр ── */
+.listen-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--rose) 22%, var(--line));
+  border-radius: var(--r-md);
+  background: var(--rose-soft);
+  color: var(--text-2);
+  font-size: 14.5px;
+}
+
+.listen-bar b {
+  color: var(--text);
+}
+
+/* Playlist-ийн хоёр баганын дээгүүр бүтэн өргөнөөр */
+.music > .listen-bar {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.listen-bar .grow {
+  flex: 1 1 200px;
+}
+
+.listen-bar.invite .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.listen-bar.invite .btn .heart path {
+  fill: currentColor;
+}
+
+.listen-hearts {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+  font-size: 17px;
+}
+
+/* Хайрт нь хамт байгаа үед зүрх тасралтгүй цохилно */
+.listen-bar.live .heart-beat {
+  animation-duration: 1.4s;
+}
+
 .np-info {
   display: flex;
   flex-wrap: wrap;

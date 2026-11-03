@@ -3,22 +3,30 @@ import MusicPlayer from "@/components/MusicPlayer";
 import SongAdd from "@/components/SongAdd";
 import { PageHead } from "@/components/ui";
 import { getCtx } from "@/lib/ctx";
+import { toListenState } from "@/lib/listen";
 import { rel } from "@/lib/time";
 import type { Who } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Our taste" };
 
 export default async function MusicPage() {
-  const { db, me, names, tz } = await getCtx();
+  const { db, s, me, partner, names, tz } = await getCtx();
   // Playlist нь нэмсэн дарааллаараа (шинэ дуу төгсгөлд)
-  const songs = await db.song.findMany({ orderBy: { createdAt: "asc" } });
+  const [songs, listen] = await Promise.all([
+    db.song.findMany({ orderBy: { createdAt: "asc" } }),
+    db.listen.findUnique({ where: { coupleId: s.id } }),
+  ]);
   const now = new Date();
 
   return (
     <>
-      <PageHead icon="music" title="Our taste" sub="Хоёулангийн playlist — дуугаа нэрээр нь хайж нэмээд, эндээс шууд сонсоорой." />
+      <PageHead icon="music" title="Our taste" sub="Хоёулангийн playlist — нэг нь тоглуулахад нөгөө нь орж ирээд яг ижил секундээс хамт сонсоно 💞" />
       <SongAdd have={songs.map((s) => s.videoId)} />
       <MusicPlayer
+        me={me}
+        partnerName={names[partner]}
+        initial={toListenState(listen)}
+        initialNow={now.getTime()}
         tracks={songs.map((s) => ({
           id: s.id,
           videoId: s.videoId,

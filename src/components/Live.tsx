@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendNudge } from "@/app/actions";
+import { ensurePushSubscription, PUSH_OFF_KEY } from "@/lib/push-client";
 import { toast, useNow } from "@/lib/fx";
 import { other, type Names, type Who } from "@/lib/types";
 import MissOverlay from "./MissOverlay";
@@ -11,7 +12,7 @@ type Pulse = {
   v: number;
   now: number;
   sync: { at: number; by: Who } | null;
-  latest: Record<"nudge" | "note" | "letter" | "qotd" | "moment" | "vault" | "song", number>;
+  latest: Record<"nudge" | "note" | "letter" | "qotd" | "moment" | "vault" | "song" | "listen", number>;
 };
 
 const POLL_MS = 3000;
@@ -20,7 +21,7 @@ const POLL_MS = 3000;
  * Хоёр тал бие биенийхээ өөрчлөлтийг харахын тулд /api/pulse-ыг байнга шалгана.
  * Өгөгдлийн хувилбар өөрчлөгдвөл хуудсыг сэргээж, хайртаасаа шинэ зүйл ирвэл мэдэгдэнэ.
  */
-export default function Live({ me, names }: { me: Who; names: Names }) {
+export default function Live({ me, names, vapidKey }: { me: Who; names: Names; vapidKey: string }) {
   const router = useRouter();
   const version = useRef<number | null>(null);
   const busy = useRef(false);
@@ -34,12 +35,13 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
       const pn = names[other(me)];
       const messages: Record<keyof Pulse["latest"], string> = {
         nudge: "",
-        note: `💌 ${pn} шинэ зурвас үлдээлээ`,
-        letter: `✉️ ${pn} чамд захидал бичлээ`,
-        qotd: `❓ ${pn} өнөөдрийн асуултад хариуллаа`,
-        moment: `📸 ${pn} өдрийн мөчөө хуваалцлаа`,
-        vault: `🔒 ${pn} Нууц өрөөнд шинэ зүйл үлдээлээ`,
-        song: `🎵 ${pn} шинэ дуу нэмлээ`,
+        note: `💌 ${pn} шинэ зурвас үлдээлээ 💕`,
+        letter: `✉️ ${pn} чамд захидал бичлээ 🔐💞`,
+        qotd: `💭 ${pn} өнөөдрийн асуултад хариуллаа ✨`,
+        moment: `📸 ${pn} өдрийн мөчөө хуваалцлаа 🥰`,
+        vault: `🔒 Нууц өрөөнд шинэ зүйл ирлээ 😏`,
+        song: `🎶 ${pn} Our taste-д дуу нэмлээ 💕`,
+        listen: `🎧 ${pn} дуу тоглуулж байна — Our taste-д ороод хамт сонсоорой 💞`,
       };
       const key = `bh_seen_${me}`;
       let seen: Record<string, number> = {};
@@ -54,7 +56,8 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
           changed = true;
         } else if (t > seen[k]) {
           if (k === "nudge") setMissed(true);
-          else toast(messages[k]);
+          // Our taste дотор байвал тоглуулагч өөрөө харуулна
+          else if (!(k === "listen" && window.location.pathname.startsWith("/music"))) toast(messages[k]);
           seen[k] = t;
           changed = true;
         }
@@ -129,6 +132,18 @@ export default function Live({ me, names }: { me: Who; names: Names }) {
       window.removeEventListener("bh:pulse", poll);
     };
   }, [poll, router]);
+
+  // Мэдэгдэл зөвшөөрсөн төхөөрөмж дээр апп нээгдэх бүрт бүртгэлээ шалгана — алга болсон эсвэл
+  // хуучирсан бол чимээгүй дахин үүсгэнэ (зөвшөөрөл дахин асуухгүй). Өөрөө унтраасан бол хөндөхгүй.
+  useEffect(() => {
+    if (!vapidKey || !("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+    try {
+      if (localStorage.getItem(PUSH_OFF_KEY) === "1") return;
+    } catch {}
+    const t = setTimeout(() => ensurePushSubscription(vapidKey).catch(() => {}), 2000);
+    return () => clearTimeout(t);
+  }, [vapidKey]);
 
   return (
     <>
